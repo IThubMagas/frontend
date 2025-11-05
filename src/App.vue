@@ -1,16 +1,19 @@
+<!-- src/App.vue -->
 <template>
   <router-view />
 </template>
 
 <script setup>
-// Ничего не нужно здесь для роутинга — всё в main.js
 </script>
 
-<style> 
+<style>
 * {
-    padding: 0;
-    margin: 0;
-   font-family: "Nunito", sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 </style>

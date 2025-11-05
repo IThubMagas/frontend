@@ -1,25 +1,20 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import './style.css' 
+import { createPinia } from 'pinia'
+import './style.css'
 import App from './App.vue'
-import ResumeAbout from './components/resume/About.vue'
-import ResumeSkills from './components/resume/Skills.vue'
+import Resume from './pages/Resume.vue'
 import Auth from './pages/Auth.vue'
 
 const routes = [
   {
     path: '/',
-    redirect: '/about' // Перенаправление на /about по умолчанию
+    redirect: '/resume'
   },
   {
-    path: '/about',
-    name: 'About',
-    component: ResumeAbout
-  },
-  {
-    path: '/skills',
-    name: 'Skills',
-    component: ResumeSkills
+    path: '/resume',
+    name: 'Resume',
+    component: Resume
   },
   {
     path: '/auth',
@@ -33,4 +28,9 @@ const router = createRouter({
   routes
 })
 
-createApp(App).use(router).mount('#app')
+const app = createApp(App)
+
+app.use(router)
+app.use(createPinia()) 
+
+app.mount('#app')
