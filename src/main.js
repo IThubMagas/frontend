@@ -5,6 +5,7 @@ import './style.css'
 import App from './App.vue'
 import Resume from './pages/Resume.vue'
 import Auth from './pages/Auth.vue'
+import Profile from './pages/Profile.vue'
 
 const routes = [
   {
@@ -20,6 +21,11 @@ const routes = [
     path: '/auth',
     name: 'Auth',
     component: Auth
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile
   }
 ]
 
