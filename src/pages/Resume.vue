@@ -12,18 +12,22 @@
           <span style="color: #999;">Соцсети:</span>
         </div>
       </div>
+      <!-- О себе -->
       <section class="section">
-      <h2 class="section-title">О себе</h2>
-      <div class="card-2">
-        <p class="section-content">
-          Чаще всего работал на языке Javascript. Но по моей инициативе для решения проблемы связанной с ограничениями языка, к нам в проект были добавлены микросервисы на Typescript. Также для контроля версий подключили Git. Да у меня отсутствует опыт работы в крупных it компаниях с бюрократией, трэкингом задач, могу ошибаться в технических терминах. Но предлагаю вам рассмотреть это как плюс, так как в небольших компаниях идет большая ответственность за свою работу, а остальное я изучу на практике со скоростью света.
-        </p>
-      </div>
-    </section>
+        <h2 class="section-title">О себе</h2>
+        <div class="card-2">
+          <p class="section-content">
+            Чаще всего работал на языке Javascript. Но по моей инициативе для решения проблемы связанной с ограничениями
+            языка, к нам в проект были добавлены микросервисы на Typescript. Также для контроля версий подключили Git.
+            Да у меня отсутствует опыт работы в крупных it компаниях с бюрократией, трэкингом задач, могу ошибаться в
+            технических терминах. Но предлагаю вам рассмотреть это как плюс, так как в небольших компаниях идет большая
+            ответственность за свою работу, а остальное я изучу на практике со скоростью света.
+          </p>
+        </div>
+      </section>
     </div>
 
-    <!-- О себе -->
-    
+
     <!-- Образование -->
     <section class="section">
       <h2 class="section-title">Образование</h2>
@@ -153,7 +157,7 @@ const projects = [
   flex-direction: column;
   gap: 32px;
   background-color: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .profile-photo {
@@ -199,7 +203,7 @@ const projects = [
   background: white;
   border-radius: 8px;
   padding: 15px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   margin-bottom: 15px;
 }
 
@@ -235,9 +239,10 @@ const projects = [
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
-.section-card{
+
+.section-card {
   display: flex;
   flex-direction: column;
 }
@@ -275,7 +280,7 @@ const projects = [
   text-decoration: underline;
 }
 
-.projects-block{
+.projects-block {
   margin: 0 0 32px;
   display: flex;
   flex-direction: column;
@@ -307,5 +312,4 @@ const projects = [
   font-size: 14px;
   margin: 0;
 }
-
 </style>
