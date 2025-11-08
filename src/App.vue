@@ -15,5 +15,6 @@
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #E9E9E9;
 }
 </style>

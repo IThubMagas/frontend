@@ -1,4 +1,3 @@
-<!-- src/components/UltimateResume.vue -->
 <template>
     <div class="ultimate-resume" :class="[store.theme, {
         'exporting': isExporting,
