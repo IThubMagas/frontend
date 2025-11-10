@@ -1,6 +1,6 @@
 <template>
-    <div class="w-[1026px] ml-[90px] mt-[100px] bg-red-300 flex gap-[130px]">
-
+    <div class="flex justify-center">
+        <div class="mainProfile w-[1026px] flex p-4 mt-[100px] gap-[130px]">
         <div class="min-w-[234px] p-20px">
             <ul class="flex gap-2 flex-col">
                 <li v-for="item in menuProfile" :key="item.menu" class="py-5 pl-5 bg gap-y-1 bg-white text-sm font-semibold">
@@ -14,7 +14,7 @@
                 <h2 class="text-[32px] font-semibold">Мой профиль</h2>
                     <div class="profile-avatar flex mt-8 items-center gap-6 ">
                         <div class="w-[84px] h-[84px] rounded-full"><img class="w-[84px] h-[84px] rounded-full" src="../../public/default-profile.png" alt="#"></div>
-                            <div class="uploadFoto-btn gap-4 flex ">
+                            <div class="gap-4 flex ">
                                 <button class="py-3 px-6 min-w-[115px] bg-[#5E61FF] rounded-lg text-white font-semibold">Загрузить фото</button>
                                 <button class="py-3 px-6 min-w-[173px] bg-white rounded-lg font-semibold">Удалить</button>
                             </div>
@@ -60,11 +60,140 @@
 
                 <div>
                     <p class="font-semibold mt-4">Кратко о себе</p>
-                    <textarea class="w-full p-3 mt-3 rounded-lg" v-model="about" placeholder="Введите информацию"></textarea>
+                    <textarea class="w-full h-[100px] p-3 mt-3 rounded-lg" v-model="about" placeholder="Введите информацию"></textarea>
                 </div>
             </div>
+
+            <div>
+                <p class="font-semibold text-[20px] mt-[60px]">Образование</p>
+
+                <div class="max-h-[76px]">
+                        <p class="font-semibold mt-4">Уровень образования</p>
+                            <select class="min-w-full max-h-12 mt-2 p-3 rounded-lg" v-model="selected">
+                                <option  v-for="education in educations" :value="education.value">
+                                    {{ education.text }}
+                                </option>
+                            </select>
+                </div>
+                
+                <div class="max-h-[76px]">
+                    <p class="font-semibold mt-4">Учебное заведение</p>
+                    <input class="min-w-full max-h-12 mt-2 p-3 rounded-lg" type="text" placeholder="Колледж IThub Magas">
+                </div>
+
+                <div class="max-h-[76px]">
+                    <p class="font-semibold mt-4">Факультет</p>
+                    <input class="min-w-full max-h-12 mt-2 p-3 rounded-lg" type="text" placeholder="Колледж IThub Magas">
+                </div>
+
+                <div class="max-h-[76px]">
+                    <p class="font-semibold mt-4">Год окончания</p>
+                    <input class="max-w-[103px] max-h-12 mt-2 p-3 rounded-lg text-black" type="text" placeholder="дд.мм.гг.">
+                </div>
+            </div>
+            
+            <div>
+                <p class="font-semibold text-[20px] mt-[60px]">Навыки</p>
+                    <textarea name="skill" class="w-full h-[100px] p-3 mt-3 rounded-lg" v-model="about" placeholder="Текст"></textarea>
+            </div>
+
+            <div>
+                <p class="font-semibold text-[20px] mt-[60px]">Достижения</p>
+                    <textarea class="w-full h-[100px] p-3 mt-3 rounded-lg" v-model="about" placeholder="Текст"></textarea>
+            </div>
+            <div class="gap-3 flex mt-3">
+                        <button class="py-3 px-6 min-w-[150px] bg-[#5E61FF] rounded-lg text-white font-semibold">Загрузить</button>
+                        <button class="py-3 px-6 min-w-[107px] bg-white rounded-lg font-semibold">Удалить</button>
+            </div>
+
+            <div>
+                <p class="font-semibold text-[20px] mt-[60px]">Проекты</p>
+
+                <div class="max-h-[76px]">
+                        <p class="font-semibold mt-4">Ссылка</p>
+                            <input class="min-w-full max-h-12 mt-2 p-3 rounded-lg" type="text" placeholder="Введите ссылку">
+                </div>
+
+                <div>
+                    <p class="font-semibold mt-4">Описание</p>
+                    <textarea 
+                        name="descript-project" 
+                        class="w-full h-[123px] min-h-[100px] max-h-[300px] p-3 mt-3 rounded-lg resize-y"
+                        v-model="about" 
+                        placeholder="Введите описание"
+                    ></textarea>
+                </div>
+            </div>
+
+            <div>
+                <p class="font-semibold text-[20px] mt-[60px]">Ссылки на соцсети</p>
+
+                    <div class="flex gap-3">
+                        <div>
+                            <p class="font-semibold mt-4">Соцсеть или сайт</p>
+                                <input class="min-w-[325px] max-h-12 mt-3 p-3 rounded-lg" type="text" placeholder="Введите название">
+                        </div>
+                        <div>
+                            <p class="font-semibold mt-4">Ссылка</p>
+                                <input class="min-w-[325px] max-h-12 mt-3 p-3 rounded-lg" type="text" placeholder="Введите ссылку">
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <div>
+                            <p class="font-semibold mt-4">Соцсеть или сайт</p>
+                                <input class="min-w-[325px] max-h-12 mt-3 p-3 rounded-lg" type="text" placeholder="Введите название">
+                        </div>
+                        <div>
+                            <p class="font-semibold mt-4">Ссылка</p>
+                                <input class="min-w-[325px] max-h-12 mt-3 p-3 rounded-lg" type="text" placeholder="Введите ссылку">
+                        </div>
+                    </div>
+            </div>
+
+            <div>
+                <p class="font-semibold text-[20px] mt-[60px]">Контакты и безопасность</p>
+
+                    <div class="flex gap-3">
+                        <div>
+                            <p class="font-semibold mt-4">Номер</p>
+                                <input class="min-w-[325px] max-h-12 mt-3 p-3 rounded-lg" type="text" placeholder="+7 (928) 321 22 22">
+                        </div>
+                        <div>
+                            <p class="font-semibold mt-4">Почта</p>
+                                <input class="min-w-[325px] max-h-12 mt-3 p-3 rounded-lg" type="text" placeholder="name@mail.ru">
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <div>
+                            <p class="font-semibold mt-4">Старый пароль</p>
+                                <input class="min-w-[325px] max-h-12 mt-3 p-3 rounded-lg" type="text" placeholder="********">
+                        </div>
+                        <div>
+                            <p class="font-semibold mt-4">Новый пароль</p>
+                                <input class="min-w-[325px] max-h-12 mt-3 p-3 rounded-lg" type="text" placeholder="********">
+                        </div>
+                    </div>
+            </div>
+
+            <div>
+                <p class="font-semibold text-[20px] mt-[60px]">Уведомления</p>
+
+                <div class="flex justify-between mt-4">
+                    <p>Уведомление за оценки</p>
+                    <input type="radio">
+                </div>
+                <div class="flex justify-between mt-4">
+                    <p>Уведомлять за посещения</p>
+                    <input type="radio">
+                </div>
+            </div>
+
+            <div class="gap-3 flex mt-[60px]">
+                        <button class="py-3 px-6 min-w-[150px] bg-[#5E61FF] rounded-lg text-white font-semibold">Сохранить</button>
+                        <button class="py-3 px-6 min-w-[107px] bg-white rounded-lg font-semibold">Отмена</button>
+            </div>  
         </div>
-        
+    </div>
     </div>
 </template>
 
@@ -88,6 +217,12 @@ const selected = ref('A')
 const options = ref([
   { text: 'Ищу работу', value: 'A' },
   { text: 'Два', value: 'B' },
+  { text: 'Три', value: 'C' }
+])
+
+const educations = ref([
+  { text: 'Среднее', value: 'Среднее' },
+  { text: 'Высшее', value: 'Высшее' },
   { text: 'Три', value: 'C' }
 ])
 </script>
