@@ -5,6 +5,7 @@ import './style.css'
 import App from './App.vue'
 import Resume from './pages/Resume.vue'
 import Auth from './pages/Auth.vue'
+import List from './pages/Spisok.vue'
 
 const routes = [
   {
@@ -20,6 +21,11 @@ const routes = [
     path: '/auth',
     name: 'Auth',
     component: Auth
+  },
+  {
+    path: '/list',
+    name: 'List',
+    component: List
   }
 ]
 
