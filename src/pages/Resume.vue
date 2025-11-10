@@ -394,7 +394,6 @@ const projects = ref([
   }
 ]);
 
-// Модальное окно
 const showModal = ref(false);
 const modalType = ref('');
 const isEditing = ref(false);
@@ -413,13 +412,13 @@ const modalData = reactive({
   description: ''
 });
 
-// Подтверждение удаления
+//////////////////////////////////////////////////////////////// Подтверждение удаления
 const showDeleteConfirm = ref(false);
 const deleteType = ref('');
 const deleteIndex = ref(-1);
 const deletePreview = ref('');
 
-// Лейблы и плейсхолдеры для полей
+//////////////////////////////////////////////////////////////// Лейблы и плейсхолдеры для полей
 const fieldLabels = {
   name: 'Имя и фамилия',
   position: 'Должность',
@@ -434,7 +433,7 @@ const fieldPlaceholders = {
   about: 'Расскажите о себе...'
 };
 
-// Вычисляемые свойства
+//////////////////////////////////////////////////////////////// Вычисляемые свойства
 const modalTitle = computed(() => {
   const types = {
     name: 'Имя',
@@ -474,7 +473,7 @@ const isFormValid = computed(() => {
   }
 });
 
-// Методы для модального окна
+//////////////////////////////////////////////////////////////// Методы для модального окна
 const openModal = (type, index = -1) => {
   modalType.value = type;
   isEditing.value = index !== -1;
@@ -589,7 +588,7 @@ const saveItem = () => {
   closeModal();
 };
 
-// Методы для удаления
+//////////////////////////////////////////////////////////////// Методы для удаления
 const deleteItem = (type, index) => {
   deleteType.value = type;
   deleteIndex.value = index;
@@ -624,7 +623,7 @@ const confirmDelete = () => {
   closeDeleteConfirm();
 };
 
-// Вспомогательные методы
+//////////////////////////////////////////////////////////////// Вспомогательные методы
 const getItemByType = (type, index) => {
   switch (type) {
     case 'skill': return skills.value[index];
