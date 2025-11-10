@@ -146,6 +146,7 @@ const projects = [
   display: flex;
   flex-direction: column;
   margin-inline: auto;
+  margin-top: 100px;
   gap: 32px;
   color: #333;
 }
