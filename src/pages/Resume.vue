@@ -1,5 +1,8 @@
 <template>
-  <div class="resume-container">
+  <div v-if="isLoading" class="loading-container">
+    <div class="loading-spinner"></div>
+  </div>
+  <div v-else class="resume-container">
     <!-- Заголовок с фото и основной информацией -->
     <div class="header-card">
       <div class="profile-section">
@@ -374,6 +377,7 @@ const resume = reactive({
   languages: [],
   isPublic: false
 });
+const isLoading = ref(true);
 
 onMounted(() => {
   getResume();
@@ -385,6 +389,7 @@ const getResume = async () => {
     const response = await axios.get(`http://localhost:3000/resume/${id}`);
 
     Object.assign(resume, response.data.resume);
+    isLoading.value = false;
   } catch (error) {
     console.error("Не удалось получить резюме", error);
   }
@@ -683,6 +688,34 @@ const editItem = (type, index) => {
 </script>
 
 <style scoped>
+.loading-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #5E61FF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 .contacts-info {
   display: flex;
   flex-wrap: wrap;
