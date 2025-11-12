@@ -4,7 +4,7 @@
     <div class="header-card">
       <div class="profile-section">
         <div class="photo-container">
-          <img :src="resume.user.avatar || 'https://via.placeholder.com/120'" alt="Фото" class="profile-photo" />
+          <img :src="`http://localhost:3000/uploads/avatars/${ resume.user.avatar }` || 'https://via.placeholder.com/120'" alt="Фото" class="profile-photo" />
           <button @click="openModal('photo')" class="edit-photo-btn" title="Изменить фото">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
@@ -358,80 +358,37 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive } from 'vue';
+import { onMounted, ref, computed, reactive } from "vue";
+import { useRoute } from "vue-router";
+import axios from "axios";
 
+const route = useRoute();
 const resume = reactive({
-  contacts: {
-    email: "john.doe@example.com",
-    phone: "+79289177234",
-    linkedin: "https://linkedin.com/in/johndoe",
-    github: "https://github.com/johndoe"
-  },
-  _id: "69131c2af93d9c74d1a99a78",
-  user: {
-    _id: "690afc84d6dc1f97a1227e30",
-    firstName: "Ахмед",
-    lastName: "Мартазанов",
-    age: 20,
-    avatar: "ava.png"
-  },
-  title: "Senior Software Engineer",
-  description: "Experienced full-stack developer with 5+ years in web development",
-  workExperience: [
-    {
-      title: "Frontend Developer",
-      company: "Tech Solutions Inc.",
-      period: "2020-2023",
-      achievements: "Разработал и внедрил новую систему компонентов, что увеличило скорость разработки на 40%"
-    },
-    {
-      title: "Junior Web Developer",
-      company: "Digital Agency Pro",
-      period: "2018-2020",
-      achievements: "Разработал и внедрил новую систему компонентов, что увеличило скорость разработки на 40%"
-    },
-    {
-      title: "Software Engineer",
-      company: "Innovation Labs",
-      period: "2023-настоящее время",
-      achievements: "Разработал и внедрил новую систему компонентов, что увеличило скорость разработки на 40%"
-    }
-  ],
-  education: [
-    {
-      degree: "Bachelor of Science",
-      field: "Computer Science",
-      institution: "University of Technology",
-      year: 2018
-    },
-    {
-      degree: "Master of Science",
-      field: "Software Engineering",
-      institution: "Tech Institute",
-      year: 2020
-    }
-  ],
-  skills: [
-    "JavaScript",
-    "TypeScript",
-    "React",
-    "Node.js",
-    "MongoDB",
-    "AWS",
-    "Docker",
-    "Git"
-  ],
-  languages: [
-    {
-      language: "Russian",
-      level: "Beginner"
-    }
-  ],
-  isPublic: true,
-  createdAt: "2025-11-11T11:21:14.869Z",
-  updatedAt: "2025-11-12T12:52:09.687Z",
-  __v: 0
+  contacts: {},
+  user: {},
+  title: "",
+  description: "",
+  workExperience: [],
+  education: [],
+  skills: [],
+  languages: [],
+  isPublic: false
 });
+
+onMounted(() => {
+  getResume();
+});
+
+const getResume = async () => {
+  try {
+    const id = route.params.id;
+    const response = await axios.get(`http://localhost:3000/resume/${id}`);
+
+    Object.assign(resume, response.data.resume);
+  } catch (error) {
+    console.error("Не удалось получить резюме", error);
+  }
+};
 
 const fullName = computed(() => `${resume.user.firstName} ${resume.user.lastName}`);
 const workExperience = computed(() => resume.workExperience || []);
