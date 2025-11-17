@@ -94,28 +94,28 @@
     </div>
 
     <div class="users-list">
-      <div v-for="user in filteredUsers" :key="user.id" class="user-card">
+      <div v-for="resume in resumes" :key="resume._id" class="user-card">
         <div class="user-info">
           <div class="avatar-container">
-            <img :src="user.avatar" :alt="user.name" class="user-avatar">
+            <img :src="resume.user.avatar ? `http://localhost:3000/uploads/avatars/${resume.user.avatar}` : '/images/placeholders/avatar.png'" :alt="resume.user.name" class="user-avatar">
           </div>
-          
+
           <div class="user-details">
-            <h3 class="user-name">{{ user.name }}</h3>
-            <p class="user-specialty">{{ user.specialty }}</p>
+            <h3 class="user-name">{{ resume.user.lastName }} {{ resume.user.firstName }} {{ resume.user.patronymic }}</h3>
+            <p class="user-specialty">{{ resume.title }}</p>
             
             <div class="user-stats">
-              <span class="projects-count">{{ user.projectsCount }} проектов</span>
+              <span class="projects-count">{{ resume.workExperience.length }} проектов</span>
               <span class="divider"></span>
-              <span class="experience-duration">{{ user.experience }}</span>
+              <span class="experience-duration">1 год</span>
             </div>
           </div>
         </div>
-        
+
         <div class="user-actions">
-          <button class="contact-button">
+          <a :href="`tel:${resume.user.phoneNumber}`" class="contact-button">
             Связаться
-          </button>
+          </a>
         </div>
       </div>
     </div>
@@ -123,6 +123,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'UserList',
   data() {
@@ -140,66 +142,13 @@ export default {
         'Информационная безопасность',
         'Цифровой маркетинг'
       ],
-      users: [
-        {
-          id: 1,
-          name: 'Мартазанов Саид-Мухаммад',
-          specialty: 'Frontend-Разработчик',
-          experience: '1 год 11 месяцев',
-          projectsCount: 5,
-          format: 'office',
-          type: 'full-time',
-          status: 'active-search',
-          avatar: '/images/orig.gif'
-        },
-        {
-          id: 2,
-          name: 'Петр Петров',
-          specialty: 'Программирование',
-          experience: '1 год',
-          projectsCount: 3,
-          format: 'remote',
-          type: 'trainee',
-          status: 'consider-offer',
-          avatar: '/images/skala-platonred.gif'
-        },
-        {
-          id: 3,
-          name: 'Мария Сидорова',
-          specialty: 'Цифровой дизайн',
-          experience: '5 лет',
-          projectsCount: 12,
-          format: 'hybrid',
-          type: 'full-time',
-          status: 'not-looking',
-          avatar: '/images/static-assets-upload10751231132763844813.webp'
-        },
-        {
-          id: 4,
-          name: 'Алексей Иванов',
-          specialty: 'Веб-разработка',
-          experience: '2 года 6 месяцев',
-          projectsCount: 8,
-          format: 'remote',
-          type: 'full-time',
-          status: 'active-search',
-          avatar: '/images/static-assets-upload16817826243958398099.webp'
-        }
-      ]
+      resumes: []
     }
   },
-  computed: {
-    filteredUsers() {
-      return this.users.filter(user => {
-        const industryMatch = this.selectedIndustries.length === 0 || 
-                             this.selectedIndustries.includes(user.specialty)
-        const formatMatch = !this.workFormat || user.format === this.workFormat
-        const typeMatch = !this.specialistType || user.type === this.specialistType
-        const statusMatch = !this.status || user.status === this.status
-        
-        return industryMatch && formatMatch && typeMatch && statusMatch
-      })
-    }
+  async mounted() {
+    const res = await axios.get("http://localhost:3000/resume")
+
+    this.resumes = res?.data?.resumes
   },
   methods: {
     toggleIndustryFilter() {
@@ -218,7 +167,6 @@ export default {
   padding: 0px;
   gap: 93px;
   width: 1026px;
-  min-height: 1744px;
   margin: 0 auto;
 }
 
@@ -232,7 +180,8 @@ export default {
   flex: none;
   order: 0;
   flex-grow: 0;
-  position: relative;
+  position: sticky;
+  height: 100%;
 }
 
 .users-list {
@@ -253,8 +202,7 @@ export default {
   justify-content: space-between;
   align-items: flex-start;
   padding: 32px;
-  gap: 100px;
-  width: 750px;
+  width: 100%;
   height: 190px;
   background: #FFFFFF;
   border-radius: 8px;
