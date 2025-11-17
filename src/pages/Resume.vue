@@ -1,119 +1,41 @@
 <template>
-  <div class="resume-container">
-    <!-- Заголовок с фото и основной информацией -->
-    <div class="header-card">
-      <div class="profile-section">
-        <div class="photo-container">
-          <img :src="resume.user.avatar || 'https://via.placeholder.com/120'" alt="Фото" class="profile-photo" />
-          <button @click="openModal('photo')" class="edit-photo-btn" title="Изменить фото">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
-                stroke-width="2" />
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor"
-                stroke-width="2" />
-            </svg>
-          </button>
-        </div>
-        <div class="header-info">
-          <div class="name-section">
-            <h1 class="name">{{ fullName }}</h1>
-            <button @click="openModal('name')" class="btn-icon edit-btn" title="Редактировать имя">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
-                  stroke-width="2" />
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor"
-                  stroke-width="2" />
-              </svg>
-            </button>
-          </div>
-          <div class="position-section">
-            <p class="position">{{ resume.title }}</p>
-            <button @click="openModal('position')" class="btn-icon edit-btn" title="Редактировать должность">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
-                  stroke-width="2" />
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor"
-                  stroke-width="2" />
-              </svg>
-            </button>
-          </div>
-          <div class="meta-info">
-            <div class="meta-item">
-              <span>Возраст: {{ resume.user.age }} лет</span>
-              <button @click="openModal('age')" class="btn-icon edit-btn small" title="Редактировать возраст">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
-                    stroke-width="2" />
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor"
-                    stroke-width="2" />
-                </svg>
-              </button>
-            </div>
-            <div class="meta-item">
-              <span>Опыт работы: {{ workExperience.length }}</span>
-            </div>
-            <div class="meta-item">
-              <span style="color: #999;">Контакты:</span>
-              <button @click="openModal('contacts')" class="btn-icon edit-btn small" title="Редактировать контакты">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" />
-                </svg>
-              </button>
-            </div>
-          </div>
-          <div class="contacts-info" v-if="hasContacts">
-            <a v-if="resume.contacts.email" :href="`mailto:${resume.contacts.email}`" class="contact-link">
-              {{ resume.contacts.email }}
-            </a>
-            <a v-if="resume.contacts.phone" :href="`tel:${resume.contacts.phone}`" class="contact-link">
-              {{ resume.contacts.phone }}
-            </a>
-            <a v-if="resume.contacts.linkedin" :href="resume.contacts.linkedin" target="_blank" class="contact-link">
-              LinkedIn
-            </a>
-            <a v-if="resume.contacts.github" :href="resume.contacts.github" target="_blank" class="contact-link">
-              GitHub
-            </a>
-          </div>
-        </div>
-      </div>
+  <div class="app-conent">
 
-      <!-- О себе -->
-      <section class="section">
-        <div class="section-header">
-          <h2 class="section-title">О себе</h2>
-          <button @click="openModal('description')" class="btn-icon edit-btn" title="Редактировать раздел">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
-                stroke-width="2" />
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor"
-                stroke-width="2" />
-            </svg>
-          </button>
-        </div>
-        <div class="card-2">
-          <p class="section-content">{{ resume.description }}</p>
-        </div>
-      </section>
+    <div class="sidebar">
+      <nav class="sidebar-nav">
+        <ul class="nav-list">
+          <li v-for="(item, index) in menuItems" :key="index" class="nav-item">
+            <a 
+              :href="`#${item.id}`" 
+              class="nav-link" 
+              :class="{ active: activeMenuItem === index }"
+            >
+              {{ item.title }}
+            </a>
+          </li>
+        </ul>
+      </nav>
     </div>
 
-    <!-- Опыт работы -->
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">Опыт работы</h2>
-        <button @click="openModal('workExperience')" class="btn btn-add">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" />
-          </svg>
-          Добавить опыт работы
-        </button>
-      </div>
-      <div class="projects-list">
-        <div v-for="(work, index) in workExperience" :key="index" class="project-card projects-block">
-          <div class="project-header">
-            <h3 class="project-title">{{ work.title }} в {{ work.company }}</h3>
-            <div class="project-actions">
-              <button @click="editItem('workExperience', index)" class="btn-icon edit-btn" title="Редактировать">
+    <div class="resume-container">
+      <!-- Заголовок с фото и основной информацией -->
+      <div class="header-card">
+        <div class="profile-section">
+          <div class="photo-container">
+            <img :src="resume.user.avatar || 'https://via.placeholder.com/120'" alt="Фото" class="profile-photo" />
+            <button @click="openModal('photo')" class="edit-photo-btn" title="Изменить фото">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
+                  stroke-width="2" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor"
+                  stroke-width="2" />
+              </svg>
+            </button>
+          </div>
+          <div class="header-info">
+            <div class="name-section">
+              <h1 class="name">{{ fullName }}</h1>
+              <button @click="openModal('name')" class="btn-icon edit-btn" title="Редактировать имя">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
                     stroke-width="2" />
@@ -121,36 +43,108 @@
                     stroke-width="2" />
                 </svg>
               </button>
-              <button @click="deleteItem('workExperience', index)" class="btn-icon delete-btn" title="Удалить">
+            </div>
+            <div class="position-section">
+              <p class="position">{{ resume.title }}</p>
+              <button @click="openModal('position')" class="btn-icon edit-btn" title="Редактировать должность">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
-                    stroke="currentColor" stroke-width="2" />
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
+                    stroke-width="2" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor"
+                    stroke-width="2" />
                 </svg>
               </button>
             </div>
+            <div class="meta-info">
+              <div class="meta-item">
+                <span>Возраст: {{ resume.user.age }} лет</span>
+                <button @click="openModal('age')" class="btn-icon edit-btn small" title="Редактировать возраст">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
+                      stroke-width="2" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor"
+                      stroke-width="2" />
+                  </svg>
+                </button>
+              </div>
+              <div class="meta-item">
+                <span>Опыт работы: {{ workExperience.length }}</span>
+              </div>
+              <div class="meta-item">
+                <span style="color: #999;">Контакты:</span>
+                <button @click="openModal('contacts')" class="btn-icon edit-btn small" title="Редактировать контакты">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="contacts-info" v-if="hasContacts">
+              <a v-if="resume.contacts.email" :href="`mailto:${resume.contacts.email}`" class="contact-link">
+                {{ resume.contacts.email }}
+              </a>
+              <a v-if="resume.contacts.phone" :href="`tel:${resume.contacts.phone}`" class="contact-link">
+                {{ resume.contacts.phone }}
+              </a>
+              <a v-if="resume.contacts.telegram" :href="resume.contacts.telegram" target="_blank" class="contact-link">
+                Telegram
+              </a>
+              <a v-if="resume.contacts.github" :href="resume.contacts.github" target="_blank" class="contact-link">
+                GitHub
+              </a>
+            </div>
           </div>
-          <p class="project-period">{{ work.period }}</p>
-          <p class="project-description">{{ work.achievements }}</p>
         </div>
-      </div>
-    </section>
 
-    <!-- Образование -->
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">Образование</h2>
-        <button @click="openModal('education')" class="btn btn-add">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" />
-          </svg>
-          Добавить образование
-        </button>
+        <!-- О себе -->
+        <section class="section">
+          <div class="section-header">
+            <h2 class="section-title">О себе</h2>
+            <button @click="openModal('description')" class="btn-icon edit-btn" title="Редактировать раздел">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
+                  stroke-width="2" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor"
+                  stroke-width="2" />
+              </svg>
+            </button>
+          </div>
+          <div class="card-2">
+            <p class="section-content">{{ resume.description }}</p>
+          </div>
+        </section>
       </div>
-      <div class="projects-list">
-        <div v-for="(edu, index) in education" :key="index" class="project-card projects-block">
-          <div class="project-header">
-            <h3 class="project-title">{{ edu.degree }} - {{ edu.field }}</h3>
-            <div class="project-actions">
+
+      <!-- Образование -->
+      <section class="section" id="education">
+        <div class="section-header">
+          <h2 class="section-title">Образование</h2>
+          <button @click="openModal('education')" class="btn btn-add">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" />
+            </svg>
+            Добавить образование
+          </button>
+        </div>
+        <div class="edu-list">
+          <div v-for="(edu, index) in education" :key="index" class="edu-item">
+            <div class="edu-row">
+              <div class="edu-label">Уровень образования</div>
+              <div class="edu-value">{{ edu.level || edu.degree }}</div>
+            </div>
+            <div class="edu-row">
+              <div class="edu-label">Учебное заведение</div>
+              <div class="edu-value">{{ edu.institution }}</div>
+            </div>
+            <div class="edu-row">
+              <div class="edu-label">Факультет/направление</div>
+              <div class="edu-value">{{ edu.field || edu.faculty }}</div>
+            </div>
+            <div class="edu-row">
+              <div class="edu-label">Год окончания</div>
+              <div class="edu-value">{{ edu.year || edu.graduationYear }}</div>
+            </div>
+            <div class="edu-actions">
               <button @click="editItem('education', index)" class="btn-icon edit-btn" title="Редактировать">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
@@ -167,205 +161,260 @@
               </button>
             </div>
           </div>
-          <p class="project-period">{{ edu.institution }}, {{ edu.year }} год</p>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Навыки -->
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">Навыки</h2>
-        <button @click="openModal('skill')" class="btn btn-add">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" />
-          </svg>
-          Добавить навык
-        </button>
-      </div>
-      <div class="project-card">
-        <div class="skill-list">
-          <span v-for="(skill, index) in skills" :key="index" class="skill-tag">
-            {{ skill }}
-            <div class="skill-actions">
-              <button @click="editItem('skill', index)" class="btn-icon edit-btn" title="Редактировать">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
-                    stroke-width="2" />
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor"
-                    stroke-width="2" />
-                </svg>
-              </button>
-              <button @click="deleteItem('skill', index)" class="btn-icon delete-btn" title="Удалить">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
-                    stroke="currentColor" stroke-width="2" />
-                </svg>
-              </button>
-            </div>
-          </span>
-        </div>
-      </div>
-    </section>
-
-    <!-- Языки -->
-    <section class="section">
-      <div class="section-header">
-        <h2 class="section-title">Языки</h2>
-        <button @click="openModal('language')" class="btn btn-add">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" />
-          </svg>
-          Добавить язык
-        </button>
-      </div>
-      <div class="project-card">
-        <div class="achievements-list">
-          <div v-for="(lang, index) in languages" :key="index" class="achievement-item">
-            <span class="achievement-link">
-              {{ lang.language }} - {{ lang.level }}
-            </span>
-            <div class="achievement-actions">
-              <button @click="editItem('language', index)" class="btn-icon edit-btn" title="Редактировать">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
-                    stroke-width="2" />
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor"
-                    stroke-width="2" />
-                </svg>
-              </button>
-              <button @click="deleteItem('language', index)" class="btn-icon delete-btn" title="Удалить">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
-                    stroke="currentColor" stroke-width="2" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Универсальное модальное окно -->
-    <div v-if="showModal" class="modal-overlay" @click="closeModal">
-      <div class="modal-content" @click.stop>
-        <div class="modal-header">
-          <h3 class="modal-title">{{ modalTitle }}</h3>
-          <button @click="closeModal" class="btn-close">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" />
+      <!-- Навыки -->
+      <section class="section" id="skills">
+        <div class="section-header">
+          <h2 class="section-title">Навыки</h2>
+          <button @click="openModal('skill')" class="btn btn-add">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" />
             </svg>
+            Добавить навык
           </button>
         </div>
-
-        <div class="modal-body">
-          <!-- Личная информация -->
-          <div v-if="['name', 'position', 'age'].includes(modalType)" class="form-group">
-            <label class="form-label">{{ fieldLabels[modalType] }}</label>
-            <input v-model="modalData.value" type="text" class="form-input"
-              :placeholder="fieldPlaceholders[modalType]" />
-          </div>
-
-          <!-- Описание -->
-          <div v-else-if="modalType === 'description'" class="form-group">
-            <label class="form-label">О себе</label>
-            <textarea v-model="modalData.description" class="form-textarea" placeholder="Расскажите о себе..."></textarea>
-          </div>
-
-          <!-- Контакты -->
-          <div v-else-if="modalType === 'contacts'" class="form-group">
-            <label class="form-label">Email</label>
-            <input v-model="modalData.email" type="email" class="form-input" placeholder="email@example.com" />
-            <label class="form-label">Телефон</label>
-            <input v-model="modalData.phone" type="tel" class="form-input" placeholder="+79289177234" />
-            <label class="form-label">LinkedIn</label>
-            <input v-model="modalData.linkedin" type="url" class="form-input" placeholder="https://linkedin.com/in/username" />
-            <label class="form-label">GitHub</label>
-            <input v-model="modalData.github" type="url" class="form-input" placeholder="https://github.com/username" />
-          </div>
-
-          <!-- Опыт работы -->
-          <div v-else-if="modalType === 'workExperience'" class="form-group">
-            <label class="form-label">Должность</label>
-            <input v-model="modalData.title" type="text" class="form-input" placeholder="Frontend Developer" />
-            <label class="form-label">Компания</label>
-            <input v-model="modalData.company" type="text" class="form-input" placeholder="Tech Solutions Inc." />
-            <label class="form-label">Период работы</label>
-            <input v-model="modalData.period" type="text" class="form-input" placeholder="2020-2023" />
-            <label class="form-label">Достижения</label>
-            <textarea v-model="modalData.achievements" class="form-textarea"
-              placeholder="Опишите ваши достижения на этой должности..."></textarea>
-          </div>
-
-          <!-- Образование -->
-          <div v-else-if="modalType === 'education'" class="form-group">
-            <label class="form-label">Степень</label>
-            <input v-model="modalData.degree" type="text" class="form-input" placeholder="Bachelor of Science" />
-            <label class="form-label">Направление</label>
-            <input v-model="modalData.field" type="text" class="form-input" placeholder="Computer Science" />
-            <label class="form-label">Учебное заведение</label>
-            <input v-model="modalData.institution" type="text" class="form-input" placeholder="University of Technology" />
-            <label class="form-label">Год окончания</label>
-            <input v-model="modalData.year" type="number" class="form-input" placeholder="2018" />
-          </div>
-
-          <!-- Навыки -->
-          <div v-else-if="modalType === 'skill'" class="form-group">
-            <label class="form-label">Название навыка</label>
-            <input v-model="modalData.name" type="text" class="form-input" placeholder="Например: JavaScript" />
-          </div>
-
-          <!-- Языки -->
-          <div v-else-if="modalType === 'language'" class="form-group">
-            <label class="form-label">Язык</label>
-            <input v-model="modalData.language" type="text" class="form-input" placeholder="Например: Английский" />
-            <label class="form-label">Уровень</label>
-            <select v-model="modalData.level" class="form-input">
-              <option value="Beginner">Начальный</option>
-              <option value="Intermediate">Средний</option>
-              <option value="Advanced">Продвинутый</option>
-              <option value="Native">Родной</option>
-            </select>
+        <div class="project-card">
+          <div class="skill-list">
+            <span v-for="(skill, index) in skills" :key="index" class="skill-tag">
+              {{ skill }}
+              <div class="skill-actions">
+                <button @click="editItem('skill', index)" class="btn-icon edit-btn" title="Редактировать">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
+                      stroke-width="2" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor"
+                      stroke-width="2" />
+                  </svg>
+                </button>
+                <button @click="deleteItem('skill', index)" class="btn-icon delete-btn" title="Удалить">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                      stroke="currentColor" stroke-width="2" />
+                  </svg>
+                </button>
+              </div>
+            </span>
           </div>
         </div>
+      </section>
 
-        <div class="modal-footer">
-          <button @click="closeModal" class="btn btn-secondary">Отмена</button>
-          <button @click="saveItem" class="btn btn-primary" :disabled="!isFormValid">
-            {{ isEditing ? 'Сохранить' : 'Добавить' }}
+      <!-- Языки -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Языки</h2>
+          <button @click="openModal('language')" class="btn btn-add">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" />
+            </svg>
+            Добавить язык
           </button>
+        </div>
+        <div class="project-card">
+          <div class="achievements-list">
+            <div v-for="(lang, index) in languages" :key="index" class="achievement-item">
+              <span class="achievement-link">
+                {{ lang.language }} - {{ lang.level }}
+              </span>
+              <div class="achievement-actions">
+                <button @click="editItem('language', index)" class="btn-icon edit-btn" title="Редактировать">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
+                      stroke-width="2" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor"
+                      stroke-width="2" />
+                  </svg>
+                </button>
+                <button @click="deleteItem('language', index)" class="btn-icon delete-btn" title="Удалить">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                      stroke="currentColor" stroke-width="2" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Опыт работы -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">Опыт работы</h2>
+          <button @click="openModal('workExperience')" class="btn btn-add">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" />
+            </svg>
+            Добавить опыт работы
+          </button>
+        </div>
+        <div class="projects-list">
+          <div v-for="(work, index) in workExperience" :key="index" class="project-card projects-block">
+            <div class="project-header">
+              <h3 class="project-title">{{ work.title }} в {{ work.company }}</h3>
+              <div class="project-actions">
+                <button @click="editItem('workExperience', index)" class="btn-icon edit-btn" title="Редактировать">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
+                      stroke-width="2" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor"
+                      stroke-width="2" />
+                  </svg>
+                </button>
+                <button @click="deleteItem('workExperience', index)" class="btn-icon delete-btn" title="Удалить">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                      stroke="currentColor" stroke-width="2" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <p class="project-period">{{ work.period }}</p>
+            <p class="project-description">{{ work.achievements }}</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Универсальное модальное окно -->
+      <div v-if="showModal" class="modal-overlay" @click="closeModal">
+        <div class="modal-content" @click.stop>
+          <div class="modal-header">
+            <h3 class="modal-title">{{ modalTitle }}</h3>
+            <button @click="closeModal" class="btn-close">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <!-- Личная информация -->
+            <div v-if="['name', 'position', 'age'].includes(modalType)" class="form-group">
+              <label class="form-label">{{ fieldLabels[modalType] }}</label>
+              <input v-model="modalData.value" type="text" class="form-input"
+                :placeholder="fieldPlaceholders[modalType]" />
+            </div>
+
+            <!-- Описание -->
+            <div v-else-if="modalType === 'description'" class="form-group">
+              <label class="form-label">О себе</label>
+              <textarea v-model="modalData.description" class="form-textarea"
+                placeholder="Расскажите о себе..."></textarea>
+            </div>
+
+            <!-- Контакты -->
+            <div v-else-if="modalType === 'contacts'" class="form-group">
+              <label class="form-label">Email</label>
+              <input v-model="modalData.email" type="email" class="form-input" placeholder="email@example.com" />
+              <label class="form-label">Телефон</label>
+              <input v-model="modalData.phone" type="tel" class="form-input" placeholder="+79289177234" />
+              <label class="form-label">Telegram</label>
+              <input v-model="modalData.telegram" type="url" class="form-input"
+                placeholder="https://telegram.com/in/username" />
+              <label class="form-label">GitHub</label>
+              <input v-model="modalData.github" type="url" class="form-input"
+                placeholder="https://github.com/username" />
+            </div>
+
+            <!-- Образование -->
+            <div v-else-if="modalType === 'education'" class="form-group">
+              <label class="form-label">Степень</label>
+              <input v-model="modalData.degree" type="text" class="form-input" placeholder="Bachelor of Science" />
+              <label class="form-label">Направление</label>
+              <input v-model="modalData.field" type="text" class="form-input" placeholder="Computer Science" />
+              <label class="form-label">Учебное заведение</label>
+              <input v-model="modalData.institution" type="text" class="form-input"
+                placeholder="University of Technology" />
+              <label class="form-label">Год окончания</label>
+              <input v-model="modalData.year" type="number" class="form-input" placeholder="2018" />
+            </div>
+
+            <!-- Опыт работы -->
+            <div v-else-if="modalType === 'workExperience'" class="form-group">
+              <label class="form-label">Должность</label>
+              <input v-model="modalData.title" type="text" class="form-input" placeholder="Frontend Developer" />
+              <label class="form-label">Компания</label>
+              <input v-model="modalData.company" type="text" class="form-input" placeholder="Tech Solutions Inc." />
+              <label class="form-label">Период работы</label>
+              <input v-model="modalData.period" type="text" class="form-input" placeholder="2020-2023" />
+              <label class="form-label">Достижения</label>
+              <textarea v-model="modalData.achievements" class="form-textarea"
+                placeholder="Опишите ваши достижения на этой должности..."></textarea>
+            </div>
+
+            <!-- Навыки -->
+            <div v-else-if="modalType === 'skill'" class="form-group">
+              <label class="form-label">Название навыка</label>
+              <input v-model="modalData.name" type="text" class="form-input" placeholder="Например: JavaScript" />
+            </div>
+
+            <!-- Языки -->
+            <div v-else-if="modalType === 'language'" class="form-group">
+              <label class="form-label">Язык</label>
+              <input v-model="modalData.language" type="text" class="form-input" placeholder="Например: Английский" />
+              <label class="form-label">Уровень</label>
+              <select v-model="modalData.level" class="form-input">
+                <option value="Beginner">Начальный</option>
+                <option value="Intermediate">Средний</option>
+                <option value="Advanced">Продвинутый</option>
+                <option value="Native">Родной</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button @click="closeModal" class="btn btn-secondary">Отмена</button>
+            <button @click="saveItem" class="btn btn-primary" :disabled="!isFormValid">
+              {{ isEditing ? 'Сохранить' : 'Добавить' }}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Подтверждение удаления -->
-    <div v-if="showDeleteConfirm" class="modal-overlay" @click="closeDeleteConfirm">
-      <div class="modal-content confirm-modal" @click.stop>
-        <div class="modal-header">
-          <h3 class="modal-title">Подтверждение удаления</h3>
-        </div>
-        <div class="modal-body">
-          <p>Вы уверены, что хотите удалить этот элемент?</p>
-          <p class="delete-preview">{{ deletePreview }}</p>
-        </div>
-        <div class="modal-footer">
-          <button @click="closeDeleteConfirm" class="btn btn-secondary">Отмена</button>
-          <button @click="confirmDelete" class="btn btn-danger">Удалить</button>
+      <!-- Подтверждение удаления -->
+      <div v-if="showDeleteConfirm" class="modal-overlay" @click="closeDeleteConfirm">
+        <div class="modal-content confirm-modal" @click.stop>
+          <div class="modal-header">
+            <h3 class="modal-title">Подтверждение удаления</h3>
+          </div>
+          <div class="modal-body">
+            <p>Вы уверены, что хотите удалить этот элемент?</p>
+            <p class="delete-preview">{{ deletePreview }}</p>
+          </div>
+          <div class="modal-footer">
+            <button @click="closeDeleteConfirm" class="btn btn-secondary">Отмена</button>
+            <button @click="confirmDelete" class="btn btn-danger">Удалить</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
 </template>
 
 <script setup>
 import { ref, computed, reactive } from 'vue';
 
+const activeMenuItem = ref(0);
+const menuItems = [
+  { title: 'Общее', id: "", blockId: "" },
+  { title: 'О себе', id: "", blockId: "" },
+  { title: 'Образование', id: "education", blockId: "" },
+  { title: 'Навыки', id: "skills", blockId: "" },
+  { title: 'Языки', id: "", blockId: "" },
+  { title: 'Опыт работы', id: "", blockId: "" },
+];
+
+const setActiveMenuItem = (index) => {
+  activeMenuItem.value = index;
+};
 const resume = reactive({
   contacts: {
     email: "john.doe@example.com",
     phone: "+79289177234",
-    linkedin: "https://linkedin.com/in/johndoe",
-    github: "https://github.com/johndoe"
+    telegram: "https://t.me/test",
+    github: "https://github.com/Spector323"
   },
   _id: "69131c2af93d9c74d1a99a78",
   user: {
@@ -376,7 +425,7 @@ const resume = reactive({
     avatar: "ava.png"
   },
   title: "Senior Software Engineer",
-  description: "Experienced full-stack developer with 5+ years in web development",
+  description: "Чаще всего работал на языке Javascript.  Но по моей инициативе для решения проблемы связанной с ограничениями языка, к нам в проект были добавлены микросервисы на Typescript. Также для контроля версий подключили Git. Да у меня отсутствует опыт работы в крупных it компаниях с бюрократией, трэкингом задач, могу ошибаться в технических терминах. Но предлагаю вам рассмотреть это как плюс, так как в небольших компаниях идет большая ответственность за свою работу, а остальное я изучу на практике со скоростью света.",
   workExperience: [
     {
       title: "Frontend Developer",
@@ -438,11 +487,11 @@ const workExperience = computed(() => resume.workExperience || []);
 const education = computed(() => resume.education || []);
 const skills = computed(() => resume.skills || []);
 const languages = computed(() => resume.languages || []);
-const hasContacts = computed(() => 
+const hasContacts = computed(() =>
   resume.contacts && (
-    resume.contacts.email || 
-    resume.contacts.phone || 
-    resume.contacts.linkedin || 
+    resume.contacts.email ||
+    resume.contacts.phone ||
+    resume.contacts.telegram ||
     resume.contacts.github
   )
 );
@@ -457,7 +506,7 @@ const modalData = reactive({
   description: '',
   email: '',
   phone: '',
-  linkedin: '',
+  telegram: '',
   github: '',
   title: '',
   company: '',
@@ -501,8 +550,8 @@ const modalTitle = computed(() => {
     age: 'Возраст',
     description: 'О себе',
     contacts: 'Контакты',
-    workExperience: 'Опыт работы',
     education: 'Образование',
+    workExperience: 'Опыт работы',
     skill: 'Навык',
     language: 'Язык'
   };
@@ -519,24 +568,24 @@ const isFormValid = computed(() => {
     case 'description':
       return modalData.description.trim().length > 0;
     case 'contacts':
-      return modalData.email.trim().length > 0 || 
-             modalData.phone.trim().length > 0 || 
-             modalData.linkedin.trim().length > 0 || 
-             modalData.github.trim().length > 0;
+      return modalData.email.trim().length > 0 ||
+        modalData.phone.trim().length > 0 ||
+        modalData.telegram.trim().length > 0 ||
+        modalData.github.trim().length > 0;
     case 'workExperience':
-      return modalData.title.trim().length > 0 && 
-             modalData.company.trim().length > 0 && 
-             modalData.period.trim().length > 0;
+      return modalData.title.trim().length > 0 &&
+        modalData.company.trim().length > 0 &&
+        modalData.period.trim().length > 0;
     case 'education':
-      return modalData.degree.trim().length > 0 && 
-             modalData.field.trim().length > 0 && 
-             modalData.institution.trim().length > 0 && 
-             modalData.year > 0;
+      return modalData.degree.trim().length > 0 &&
+        modalData.field.trim().length > 0 &&
+        modalData.institution.trim().length > 0 &&
+        modalData.year > 0;
     case 'skill':
       return modalData.name.trim().length > 0;
     case 'language':
-      return modalData.language.trim().length > 0 && 
-             modalData.level.trim().length > 0;
+      return modalData.language.trim().length > 0 &&
+        modalData.level.trim().length > 0;
     default:
       return false;
   }
@@ -612,7 +661,7 @@ const saveItem = () => {
       Object.assign(resume.contacts, {
         email: modalData.email.trim(),
         phone: modalData.phone.trim(),
-        linkedin: modalData.linkedin.trim(),
+        telegram: modalData.telegram.trim(),
         github: modalData.github.trim()
       });
       break;
@@ -672,11 +721,11 @@ const deleteItem = (type, index) => {
 
   const item = getItemByType(type, index);
   if (item) {
-    deletePreview.value = type === 'skill' ? item : 
-                         type === 'language' ? `${item.language} - ${item.level}` : 
-                         type === 'workExperience' ? `${item.title} в ${item.company}` :
-                         type === 'education' ? `${item.degree} - ${item.field}` :
-                         item.title || item.name || 'Элемент';
+    deletePreview.value = type === 'skill' ? item :
+      type === 'language' ? `${item.language} - ${item.level}` :
+        type === 'workExperience' ? `${item.title} в ${item.company}` :
+          type === 'education' ? `${item.degree} - ${item.field}` :
+            item.title || item.name || 'Элемент';
   }
 
   showDeleteConfirm.value = true;
@@ -726,6 +775,51 @@ const editItem = (type, index) => {
 </script>
 
 <style scoped>
+.app-conent {
+  display: flex;
+  margin-top: 100px;
+  width: 1260px;
+  margin-inline: auto;
+  margin-bottom: 100px;
+  gap: 104px;
+}
+
+.sidebar {
+  color: #0B0B0B;
+  height: 100vh;
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 240px;
+  border-radius: 10px;
+  gap: 8px;
+}
+
+.nav-link {
+  display: block;
+  padding: 12px 20px;
+  color: #0B0B0B;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  background-color: #fff;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  background-color: #EBEEFE;
+  color: #333;
+}
+
+.nav-link.active {
+  background-color: #EBEEFE;
+  font-weight: bold;
+}
+
 .contacts-info {
   display: flex;
   flex-wrap: wrap;
@@ -757,13 +851,53 @@ const editItem = (type, index) => {
 .resume-container {
   font-family: "Inter", sans-serif;
   font-optical-sizing: auto;
-  max-width: 600px;
+  max-width: 700px;
   display: flex;
   flex-direction: column;
   margin-inline: auto;
-  margin-top: 100px;
+  
   gap: 32px;
   color: #333;
+}
+
+.edu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.edu-item {
+  position: relative;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.edu-label {
+  min-width: 180px;
+  font-weight: 600;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.edu-value {
+  flex: 1;
+  color: #333;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.edu-actions {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
 }
 
 .header-card {
@@ -843,7 +977,8 @@ const editItem = (type, index) => {
 
 .meta-info {
   display: flex;
-  gap: 32px;
+  flex-direction: column;
+  gap: 12px;
   font-size: 14px;
   font-weight: 500;
   margin-top: 16px;
@@ -878,8 +1013,8 @@ const editItem = (type, index) => {
 
 .edu-row {
   display: flex;
+  gap: 5px;
   flex-direction: column;
-  margin-bottom: 10px;
 }
 
 .label {
@@ -913,7 +1048,7 @@ const editItem = (type, index) => {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 8px;
   border-radius: 6px;
   font-size: 14px;
   background-color: #EBEBFF;
@@ -1189,7 +1324,6 @@ const editItem = (type, index) => {
   margin-top: 20px;
 }
 
-/* Формы */
 .form-group {
   margin-bottom: 20px;
 }
@@ -1235,7 +1369,6 @@ const editItem = (type, index) => {
   margin: 10px 0 0 0;
 }
 
-/* Анимации */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -1257,5 +1390,4 @@ const editItem = (type, index) => {
     transform: translateY(0);
   }
 }
-
 </style>

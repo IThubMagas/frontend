@@ -11,7 +11,7 @@ import Profile from './pages/Profile.vue'
 const routes = [
   {
     path: '/',
-    redirect: '/resume'
+    redirect: '/auth'
   },
   {
     path: '/resume/:id',

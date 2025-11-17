@@ -1,4 +1,3 @@
-// src/stores/resumeStore.js
 import { defineStore } from 'pinia'
 
 const generateId = (arr) => Math.max(0, ...arr.map(i => i.id || 0)) + 1
