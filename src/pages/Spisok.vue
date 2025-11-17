@@ -12,9 +12,9 @@
 
       <transition name="dropdown">
         <div v-if="showIndustryFilter" class="industry-dropdown">
-          <div v-for="industry in industries" :key="industry" class="industry-item">
-            <input type="checkbox" :id="industry" v-model="selectedIndustries" :value="industry" class="industry-checkbox">
-            <label :for="industry" class="industry-label">{{ industry }}</label>
+          <div v-for="industry in industries" :key="industry.enTitle" class="industry-item">
+            <input type="checkbox" :id="industry.enTitle" v-model="selectedIndustries" :value="industry.enTitle" class="industry-checkbox">
+            <label :for="industry.enTitle" class="industry-label">{{ industry.ruTitle }}</label>
           </div>
         </div>
       </transition>
@@ -24,17 +24,9 @@
           <span class="filter-title">Формат работы</span>
         </div>
         <div class="filter-options">
-          <div class="filter-option">
-            <input type="radio" id="office" value="office" v-model="workFormat" class="radio-input">
-            <label for="office" class="radio-label">В офисе</label>
-          </div>
-          <div class="filter-option">
-            <input type="radio" id="remote" value="remote" v-model="workFormat" class="radio-input">
-            <label for="remote" class="radio-label">Удаленно</label>
-          </div>
-          <div class="filter-option">
-            <input type="radio" id="hybrid" value="hybrid" v-model="workFormat" class="radio-input">
-            <label for="hybrid" class="radio-label">Гибрид</label>
+          <div class="filter-option" v-for="workFormat in workFormats" :key="workFormat.enTitle">
+            <input type="radio" :id="workFormat.enTitle" :value="workFormat.enTitle" v-model="selectedWorkFormat" class="radio-input">
+            <label :for="workFormat.enTitle" class="radio-label">{{ workFormat.ruTitle }}</label>
           </div>
         </div>
       </div>
@@ -44,21 +36,9 @@
           <span class="filter-title">Тип специалиста</span>
         </div>
         <div class="filter-options">
-          <div class="filter-option">
-            <input type="radio" id="trainee" value="trainee" v-model="specialistType" class="radio-input">
-            <label for="trainee" class="radio-label">Стажер</label>
-          </div>
-          <div class="filter-option">
-            <input type="radio" id="volunteer" value="volunteer" v-model="specialistType" class="radio-input">
-            <label for="volunteer" class="radio-label">Волонтер</label>
-          </div>
-          <div class="filter-option">
-            <input type="radio" id="full-time" value="full-time" v-model="specialistType" class="radio-input">
-            <label for="full-time" class="radio-label">На полную занятость</label>
-          </div>
-          <div class="filter-option">
-            <input type="radio" id="part-time" value="part-time" v-model="specialistType" class="radio-input">
-            <label for="part-time" class="radio-label">На частичную занятость</label>
+          <div class="filter-option" v-for="employmentType in employmentTypes" :key="employmentType.enTitle">
+            <input type="radio" :id="employmentType.enTitle" :value="employmentType.enTitle" v-model="selectedEmploymentType" class="radio-input">
+            <label :for="employmentType.enTitle" class="radio-label">{{ employmentType.ruTitle }}</label>
           </div>
         </div>
       </div>
@@ -68,25 +48,11 @@
           <span class="filter-title">Статус</span>
         </div>
         <div class="filter-options">
-          <div class="filter-option">
-            <input type="radio" id="not-looking" value="not-looking" v-model="status" class="radio-input">
-            <label for="not-looking" class="radio-label">
-              Не ищет работу
-              <span class="status-count">10 234</span>
-            </label>
-          </div>
-          <div class="filter-option">
-            <input type="radio" id="consider-offer" value="consider-offer" v-model="status" class="radio-input">
-            <label for="consider-offer" class="radio-label">
-              Рассмотрит оффер
-              <span class="status-count">5 678</span>
-            </label>
-          </div>
-          <div class="filter-option">
-            <input type="radio" id="active-search" value="active-search" v-model="status" class="radio-input">
-            <label for="active-search" class="radio-label">
-              В активном поиске
-              <span class="status-count">3 456</span>
+          <div class="filter-option" v-for="status in statuses" :key="status.enTitle">
+            <input type="radio" :id="status.enTitle" :value="status.enTitle" v-model="selectedStatus" class="radio-input">
+            <label :for="status.enTitle" class="radio-label">
+              {{ status.ruTitle }}
+              <span class="status-count">{{ status.count }}</span>
             </label>
           </div>
         </div>
@@ -105,7 +71,7 @@
             <p class="user-specialty">{{ resume.title }}</p>
             
             <div class="user-stats">
-              <span class="projects-count">{{ resume.workExperience.length }} проектов</span>
+              <span class="projects-count">{{ getProjectsString(resume.workExperience.length) }}</span>
               <span class="divider"></span>
               <span class="experience-duration">1 год</span>
             </div>
@@ -131,28 +97,99 @@ export default {
     return {
       showIndustryFilter: false,
       selectedIndustries: [],
-      workFormat: '',
-      specialistType: '',
-      status: '',
+      selectedWorkFormat: '',
+      selectedEmploymentType: '',
+      selectedStatus: '',
       industries: [
-        'Веб-разработка',
-        'Программирование',
-        'Цифровой дизайн',
-        'Разработка игр',
-        'Информационная безопасность',
-        'Цифровой маркетинг'
+        { ruTitle: 'Веб-разработка', enTitle: "Web Development" },
+        { ruTitle: 'Программирование', enTitle: "Programming" },
+        { ruTitle: 'Цифровой дизайн', enTitle: "Digital Design" },
+        { ruTitle: 'Разработка игр', enTitle: "Game Development" },
+        { ruTitle: 'Информационная безопасность', enTitle: "Information Security" },
+        { ruTitle: 'Цифровой маркетинг', enTitle: "Digital Marketing" },
+      ],
+      workFormats: [
+        { ruTitle: "В офисе", enTitle: "On-site" },
+        { ruTitle: "Удаленно", enTitle: "Remote" },
+        { ruTitle: "Гибрид", enTitle: "Hybrid" },
+      ],
+      employmentTypes: [
+        { ruTitle: "Стажер", enTitle:"Intern" },
+        { ruTitle: "Волонтер", enTitle:"Volunteer" },
+        { ruTitle: "На полную занятость", enTitle:"Full-time" },
+        { ruTitle: "На частичную занятость", enTitle:"Part-time" },
+      ],
+      statuses: [
+        { ruTitle: "Не ищет работу", enTitle: "Not looking", count: 0 },
+        { ruTitle: "Рассмотрит оффер", enTitle: "Open to offers", count: 0 },
+        { ruTitle: "В активном поиске", enTitle: "Actively searching", count: 0 },
       ],
       resumes: []
     }
   },
-  async mounted() {
-    const res = await axios.get("http://localhost:3000/resume")
-
-    this.resumes = res?.data?.resumes
+  mounted() {
+    this.loadResumes()
+    this.loadStatusCounts()
   },
   methods: {
     toggleIndustryFilter() {
       this.showIndustryFilter = !this.showIndustryFilter
+    },
+    async loadResumes() {
+      try {
+        let queryString = ''
+        if(this.selectedIndustries.length) queryString += `industry=${this.selectedIndustries.join()}&`
+        if(this.selectedWorkFormat) queryString += `workFormat=${this.selectedWorkFormat}&`
+        if(this.selectedEmploymentType) queryString += `employmentType=${this.selectedEmploymentType}&`
+        if(this.selectedStatus) queryString += `status=${this.selectedStatus}&`
+
+        const res = await axios.get(`http://localhost:3000/resume?${queryString}`)
+        this.resumes = res?.data?.resumes
+      } catch (error) {
+          console.error('Ошибка:', error)
+          this.resumes = []
+      }
+    },
+    async loadStatusCounts() {
+      for (const status of this.statuses) {
+        try {
+          const response = await axios.get(`http://localhost:3000/resume/count?status=${status.enTitle}`)
+          status.count = response.data
+        } catch (error) {
+          console.error('Ошибка:', error)
+          status.count = 0
+        }
+      }
+    },
+    getProjectsString(count) {
+      const lastNumber = count % 10;
+      const lastTwoNumbers = count % 100;
+
+      if (lastTwoNumbers >= 11 && lastTwoNumbers <= 14) {
+        return `${count} проектов`;
+      }
+
+      if (lastNumber === 1) {
+        return `${count} проект`;
+      } else if (lastNumber >= 2 && lastNumber <= 4) {
+        return `${count} проекта`;
+      } else {
+        return `${count} проектов`;
+      }
+    }
+  },
+  watch: {
+    selectedIndustries() {
+      this.loadResumes()
+    },
+    selectedWorkFormat() {
+      this.loadResumes()
+    },
+    selectedEmploymentType() {
+      this.loadResumes()
+    },
+    selectedStatus() {
+      this.loadResumes()
     }
   }
 }
