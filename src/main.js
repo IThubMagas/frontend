@@ -14,7 +14,7 @@ const routes = [
     redirect: '/resume'
   },
   {
-    path: '/resume',
+    path: '/resume/:id',
     name: 'Resume',
     component: Resume
   },
