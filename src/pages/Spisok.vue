@@ -12,9 +12,10 @@
 
       <transition name="dropdown">
         <div v-if="showIndustryFilter" class="industry-dropdown">
-          <div v-for="industry in industries" :key="industry" class="industry-item">
-            <input type="checkbox" :id="industry" v-model="selectedIndustries" :value="industry" class="industry-checkbox">
-            <label :for="industry" class="industry-label">{{ industry }}</label>
+          <div v-for="industry in industries" :key="industry.enTitle" class="industry-item">
+            <input type="checkbox" :id="industry.enTitle" v-model="selectedIndustries" :value="industry.enTitle"
+              class="industry-checkbox">
+            <label :for="industry.enTitle" class="industry-label">{{ industry.ruTitle }}</label>
           </div>
         </div>
       </transition>
@@ -24,17 +25,10 @@
           <span class="filter-title">Формат работы</span>
         </div>
         <div class="filter-options">
-          <div class="filter-option">
-            <input type="radio" id="office" value="office" v-model="workFormat" class="radio-input">
-            <label for="office" class="radio-label">В офисе</label>
-          </div>
-          <div class="filter-option">
-            <input type="radio" id="remote" value="remote" v-model="workFormat" class="radio-input">
-            <label for="remote" class="radio-label">Удаленно</label>
-          </div>
-          <div class="filter-option">
-            <input type="radio" id="hybrid" value="hybrid" v-model="workFormat" class="radio-input">
-            <label for="hybrid" class="radio-label">Гибрид</label>
+          <div class="filter-option" v-for="workFormat in workFormats" :key="workFormat.enTitle">
+            <input type="radio" :id="workFormat.enTitle" :value="workFormat.enTitle" v-model="selectedWorkFormat"
+              @click="workFormat.enTitle === selectedWorkFormat ? selectedWorkFormat = '' : null" class="radio-input">
+            <label :for="workFormat.enTitle" class="radio-label">{{ workFormat.ruTitle }}</label>
           </div>
         </div>
       </div>
@@ -44,21 +38,12 @@
           <span class="filter-title">Тип специалиста</span>
         </div>
         <div class="filter-options">
-          <div class="filter-option">
-            <input type="radio" id="trainee" value="trainee" v-model="specialistType" class="radio-input">
-            <label for="trainee" class="radio-label">Стажер</label>
-          </div>
-          <div class="filter-option">
-            <input type="radio" id="volunteer" value="volunteer" v-model="specialistType" class="radio-input">
-            <label for="volunteer" class="radio-label">Волонтер</label>
-          </div>
-          <div class="filter-option">
-            <input type="radio" id="full-time" value="full-time" v-model="specialistType" class="radio-input">
-            <label for="full-time" class="radio-label">На полную занятость</label>
-          </div>
-          <div class="filter-option">
-            <input type="radio" id="part-time" value="part-time" v-model="specialistType" class="radio-input">
-            <label for="part-time" class="radio-label">На частичную занятость</label>
+          <div class="filter-option" v-for="employmentType in employmentTypes" :key="employmentType.enTitle">
+            <input type="radio" :id="employmentType.enTitle" :value="employmentType.enTitle"
+              v-model="selectedEmploymentType"
+              @click="employmentType.enTitle === selectedEmploymentType ? selectedEmploymentType = '' : null"
+              class="radio-input">
+            <label :for="employmentType.enTitle" class="radio-label">{{ employmentType.ruTitle }}</label>
           </div>
         </div>
       </div>
@@ -68,142 +53,209 @@
           <span class="filter-title">Статус</span>
         </div>
         <div class="filter-options">
-          <div class="filter-option">
-            <input type="radio" id="not-looking" value="not-looking" v-model="status" class="radio-input">
-            <label for="not-looking" class="radio-label">
-              Не ищет работу
-              <span class="status-count">10 234</span>
-            </label>
-          </div>
-          <div class="filter-option">
-            <input type="radio" id="consider-offer" value="consider-offer" v-model="status" class="radio-input">
-            <label for="consider-offer" class="radio-label">
-              Рассмотрит оффер
-              <span class="status-count">5 678</span>
-            </label>
-          </div>
-          <div class="filter-option">
-            <input type="radio" id="active-search" value="active-search" v-model="status" class="radio-input">
-            <label for="active-search" class="radio-label">
-              В активном поиске
-              <span class="status-count">3 456</span>
+          <div class="filter-option" v-for="status in statuses" :key="status.enTitle">
+            <input type="radio" :id="status.enTitle" :value="status.enTitle" v-model="selectedStatus"
+              @click="status.enTitle === selectedStatus ? selectedStatus = '' : null" class="radio-input">
+            <label :for="status.enTitle" class="radio-label">
+              {{ status.ruTitle }}
+              <span class="status-count">{{ status.count }}</span>
             </label>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="users-list">
-      <div v-for="user in filteredUsers" :key="user.id" class="user-card">
-        <div class="user-info">
-          <div class="avatar-container">
-            <img :src="user.avatar" :alt="user.name" class="user-avatar">
-          </div>
-          
-          <div class="user-details">
-            <h3 class="user-name">{{ user.name }}</h3>
-            <p class="user-specialty">{{ user.specialty }}</p>
-            
-            <div class="user-stats">
-              <span class="projects-count">{{ user.projectsCount }} проектов</span>
-              <span class="divider"></span>
-              <span class="experience-duration">{{ user.experience }}</span>
+    <div>
+      <div class="users-list" v-if="!isResumesLoading && resumes.length">
+        <div v-for="resume in resumes" :key="resume._id" class="user-card">
+          <div class="user-info">
+            <div class="avatar-container">
+              <img
+                :src="resume.user.avatar ? `http://localhost:3000/uploads/avatars/${resume.user.avatar}` : '/images/placeholders/avatar.png'"
+                :alt="resume.user.name" class="user-avatar">
+            </div>
+
+            <div class="user-details">
+              <h3 class="user-name">{{ resume.user.lastName }} {{ resume.user.firstName }} {{ resume.user.patronymic }}
+              </h3>
+              <p class="user-specialty">{{ resume.title }}</p>
+
+              <div class="user-stats">
+                <span class="projects-count">{{ getProjectsString(resume.workExperience.length + resume.petProjects.length) }}</span>
+                <span class="divider"></span>
+                <span class="experience-duration">{{ calculateExperience(resume.workExperience) }}</span>
+              </div>
             </div>
           </div>
+
+          <div class="user-actions">
+            <a :href="`tel:${resume.user.phoneNumber}`" class="contact-button">
+              Связаться
+            </a>
+          </div>
         </div>
-        
-        <div class="user-actions">
-          <button class="contact-button">
-            Связаться
-          </button>
-        </div>
+      </div>
+
+      <div class="pagination" v-if="!isResumesLoading && resumes.length">
+        <button :disabled="!pagination.hasPrev" @click="prevPage"><</button>
+        <span>{{ pagination.currentPage }} / {{ pagination.totalPages }}</span>
+        <button :disabled="!pagination.hasNext" @click="nextPage">></button>
+      </div>
+
+      <div class="no-data" v-else-if="!isResumesLoading && !resumes.length">
+        По вашим фильтрам резюме не найдено. Попробуйте поменять фильтры.
+      </div>
+
+      <div class="loader-container" v-else>
+        <span class="loader"></span>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'UserList',
   data() {
     return {
       showIndustryFilter: false,
       selectedIndustries: [],
-      workFormat: '',
-      specialistType: '',
-      status: '',
+      selectedWorkFormat: '',
+      selectedEmploymentType: '',
+      selectedStatus: '',
       industries: [
-        'Веб-разработка',
-        'Программирование',
-        'Цифровой дизайн',
-        'Разработка игр',
-        'Информационная безопасность',
-        'Цифровой маркетинг'
+        { ruTitle: 'Веб-разработка', enTitle: "Web Development" },
+        { ruTitle: 'Программирование', enTitle: "Programming" },
+        { ruTitle: 'Цифровой дизайн', enTitle: "Digital Design" },
+        { ruTitle: 'Разработка игр', enTitle: "Game Development" },
+        { ruTitle: 'Информационная безопасность', enTitle: "Information Security" },
+        { ruTitle: 'Цифровой маркетинг', enTitle: "Digital Marketing" },
       ],
-      users: [
-        {
-          id: 1,
-          name: 'Мартазанов Саид-Мухаммад',
-          specialty: 'Frontend-Разработчик',
-          experience: '1 год 11 месяцев',
-          projectsCount: 5,
-          format: 'office',
-          type: 'full-time',
-          status: 'active-search',
-          avatar: '/images/orig.gif'
-        },
-        {
-          id: 2,
-          name: 'Петр Петров',
-          specialty: 'Программирование',
-          experience: '1 год',
-          projectsCount: 3,
-          format: 'remote',
-          type: 'trainee',
-          status: 'consider-offer',
-          avatar: '/images/skala-platonred.gif'
-        },
-        {
-          id: 3,
-          name: 'Мария Сидорова',
-          specialty: 'Цифровой дизайн',
-          experience: '5 лет',
-          projectsCount: 12,
-          format: 'hybrid',
-          type: 'full-time',
-          status: 'not-looking',
-          avatar: '/images/static-assets-upload10751231132763844813.webp'
-        },
-        {
-          id: 4,
-          name: 'Алексей Иванов',
-          specialty: 'Веб-разработка',
-          experience: '2 года 6 месяцев',
-          projectsCount: 8,
-          format: 'remote',
-          type: 'full-time',
-          status: 'active-search',
-          avatar: '/images/static-assets-upload16817826243958398099.webp'
-        }
-      ]
+      workFormats: [
+        { ruTitle: "В офисе", enTitle: "On-site" },
+        { ruTitle: "Удаленно", enTitle: "Remote" },
+        { ruTitle: "Гибрид", enTitle: "Hybrid" },
+      ],
+      employmentTypes: [
+        { ruTitle: "Стажер", enTitle: "Intern" },
+        { ruTitle: "Волонтер", enTitle: "Volunteer" },
+        { ruTitle: "На полную занятость", enTitle: "Full-time" },
+        { ruTitle: "На частичную занятость", enTitle: "Part-time" },
+      ],
+      statuses: [
+        { ruTitle: "Не ищет работу", enTitle: "Not looking", count: 0 },
+        { ruTitle: "Рассмотрит оффер", enTitle: "Open to offers", count: 0 },
+        { ruTitle: "В активном поиске", enTitle: "Actively searching", count: 0 },
+      ],
+      resumes: [],
+      pagination: {},
+      isResumesLoading: false
     }
   },
-  computed: {
-    filteredUsers() {
-      return this.users.filter(user => {
-        const industryMatch = this.selectedIndustries.length === 0 || 
-                             this.selectedIndustries.includes(user.specialty)
-        const formatMatch = !this.workFormat || user.format === this.workFormat
-        const typeMatch = !this.specialistType || user.type === this.specialistType
-        const statusMatch = !this.status || user.status === this.status
-        
-        return industryMatch && formatMatch && typeMatch && statusMatch
-      })
-    }
+  mounted() {
+    this.loadResumes()
+    this.loadStatusCounts()
   },
   methods: {
     toggleIndustryFilter() {
       this.showIndustryFilter = !this.showIndustryFilter
+    },
+    async loadResumes(page = 1) {
+      try {
+        this.isResumesLoading = true
+        let queryString = `page=${page}&`
+        if (this.selectedIndustries.length) queryString += `industry=${this.selectedIndustries.join()}&`
+        if (this.selectedWorkFormat) queryString += `workFormat=${this.selectedWorkFormat}&`
+        if (this.selectedEmploymentType) queryString += `employmentType=${this.selectedEmploymentType}&`
+        if (this.selectedStatus) queryString += `status=${this.selectedStatus}&`
+
+        const res = await axios.get(`http://localhost:3000/resume?${queryString}`)
+        this.resumes = res?.data?.resumes
+        this.pagination = res?.data?.pagination
+        this.isResumesLoading = false
+      } catch (error) {
+        console.error('Ошибка:', error)
+        this.resumes = []
+        this.isResumesLoading = false
+      }
+    },
+    async loadStatusCounts() {
+      for (const status of this.statuses) {
+        try {
+          const response = await axios.get(`http://localhost:3000/resume/count?status=${status.enTitle}`)
+          status.count = response.data
+        } catch (error) {
+          console.error('Ошибка:', error)
+          status.count = 0
+        }
+      }
+    },
+    getProjectsString(count) {
+      const lastNumber = count % 10;
+      const lastTwoNumbers = count % 100;
+
+      if (lastTwoNumbers >= 11 && lastTwoNumbers <= 14) {
+        return `${count} проектов`;
+      }
+
+      if (lastNumber === 1) {
+        return `${count} проект`;
+      } else if (lastNumber >= 2 && lastNumber <= 4) {
+        return `${count} проекта`;
+      } else {
+        return `${count} проектов`;
+      }
+    },
+    calculateExperience(jobs) {
+      let total = 0;
+      const currentYear = new Date().getFullYear();
+    
+      for (const job of jobs) {
+        const [start, end] = job.period.split('-');
+        const endYear = end === 'настоящее время' ? currentYear : parseInt(end);
+        const startYear = parseInt(start);
+      
+        total += endYear - startYear;
+      }
+    
+      const lastDigit = total % 10;
+      const lastTwoDigits = total % 100;
+
+      if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+        return `${total} лет`;
+      }
+
+      if (lastDigit === 1) {
+        return `${total} год`;
+      }
+
+      if (lastDigit >= 2 && lastDigit <= 4) {
+        return `${total} года`;
+      }
+
+      return `${total} лет`;
+    },
+    prevPage() {
+      this.loadResumes(this.pagination.currentPage-1)
+    },
+    nextPage() {
+      this.loadResumes(this.pagination.currentPage+1)
+    },
+  },
+  watch: {
+    selectedIndustries() {
+      this.loadResumes()
+    },
+    selectedWorkFormat() {
+      this.loadResumes()
+    },
+    selectedEmploymentType() {
+      this.loadResumes()
+    },
+    selectedStatus() {
+      this.loadResumes()
     }
   }
 }
@@ -215,10 +267,9 @@ export default {
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 0px;
+  padding: 40px 0;
   gap: 93px;
   width: 1026px;
-  min-height: 1744px;
   margin: 0 auto;
 }
 
@@ -232,7 +283,9 @@ export default {
   flex: none;
   order: 0;
   flex-grow: 0;
-  position: relative;
+  position: sticky;
+  top: 70px;
+  height: 100%;
 }
 
 .users-list {
@@ -253,8 +306,7 @@ export default {
   justify-content: space-between;
   align-items: flex-start;
   padding: 32px;
-  gap: 100px;
-  width: 750px;
+  width: 100%;
   height: 190px;
   background: #FFFFFF;
   border-radius: 8px;
@@ -654,6 +706,111 @@ export default {
   right: 0;
 }
 
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.pagination button {
+  background-color: #5E61FF;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+
+  &:disabled {
+    cursor: not-allowed;
+    background-color: #5E61FF9e;
+  }
+}
+
+.pagination span {
+  padding: 0 10px;
+}
+
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0px;
+  gap: 32px;
+  width: 662px;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 125%;
+  color: #262626;
+}
+
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0px;
+  gap: 32px;
+  width: 662px;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  border: 3px solid;
+  border-color: #FFF #FFF transparent transparent;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+.loader::after,
+.loader::before {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  border: 3px solid;
+  border-color: transparent transparent #5E61FF #5E61FF;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  animation: rotationBack 0.5s linear infinite;
+  transform-origin: center center;
+}
+
+.loader::before {
+  width: 32px;
+  height: 32px;
+  border-color: #FFF #FFF transparent transparent;
+  animation: rotation 1.5s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rotationBack {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
 * {
   font-family: 'Inter', sans-serif;
   box-sizing: border-box;
@@ -666,29 +823,29 @@ export default {
     gap: 40px;
     flex-direction: column;
   }
-  
+
   .filters-sidebar {
     width: 100%;
   }
-  
+
   .users-list {
     width: 100%;
   }
-  
+
   .user-card {
     width: 100%;
     gap: 40px;
     padding: 24px;
   }
-  
+
   .industry-dropdown {
     width: 100%;
   }
-  
+
   .user-actions {
     width: 140px;
   }
-  
+
   .contact-button {
     width: 140px;
   }
@@ -700,16 +857,16 @@ export default {
     height: auto;
     gap: 24px;
   }
-  
+
   .user-info {
     width: 100%;
   }
-  
+
   .user-actions {
     width: 100%;
     align-items: stretch;
   }
-  
+
   .contact-button {
     width: 100%;
   }
