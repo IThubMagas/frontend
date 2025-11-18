@@ -13,7 +13,8 @@
       <transition name="dropdown">
         <div v-if="showIndustryFilter" class="industry-dropdown">
           <div v-for="industry in industries" :key="industry.enTitle" class="industry-item">
-            <input type="checkbox" :id="industry.enTitle" v-model="selectedIndustries" :value="industry.enTitle" class="industry-checkbox">
+            <input type="checkbox" :id="industry.enTitle" v-model="selectedIndustries" :value="industry.enTitle"
+              class="industry-checkbox">
             <label :for="industry.enTitle" class="industry-label">{{ industry.ruTitle }}</label>
           </div>
         </div>
@@ -25,7 +26,8 @@
         </div>
         <div class="filter-options">
           <div class="filter-option" v-for="workFormat in workFormats" :key="workFormat.enTitle">
-            <input type="radio" :id="workFormat.enTitle" :value="workFormat.enTitle" v-model="selectedWorkFormat" class="radio-input">
+            <input type="radio" :id="workFormat.enTitle" :value="workFormat.enTitle" v-model="selectedWorkFormat"
+              @click="workFormat.enTitle === selectedWorkFormat ? selectedWorkFormat = '' : null" class="radio-input">
             <label :for="workFormat.enTitle" class="radio-label">{{ workFormat.ruTitle }}</label>
           </div>
         </div>
@@ -37,7 +39,10 @@
         </div>
         <div class="filter-options">
           <div class="filter-option" v-for="employmentType in employmentTypes" :key="employmentType.enTitle">
-            <input type="radio" :id="employmentType.enTitle" :value="employmentType.enTitle" v-model="selectedEmploymentType" class="radio-input">
+            <input type="radio" :id="employmentType.enTitle" :value="employmentType.enTitle"
+              v-model="selectedEmploymentType"
+              @click="employmentType.enTitle === selectedEmploymentType ? selectedEmploymentType = '' : null"
+              class="radio-input">
             <label :for="employmentType.enTitle" class="radio-label">{{ employmentType.ruTitle }}</label>
           </div>
         </div>
@@ -49,7 +54,8 @@
         </div>
         <div class="filter-options">
           <div class="filter-option" v-for="status in statuses" :key="status.enTitle">
-            <input type="radio" :id="status.enTitle" :value="status.enTitle" v-model="selectedStatus" class="radio-input">
+            <input type="radio" :id="status.enTitle" :value="status.enTitle" v-model="selectedStatus"
+              @click="status.enTitle === selectedStatus ? selectedStatus = '' : null" class="radio-input">
             <label :for="status.enTitle" class="radio-label">
               {{ status.ruTitle }}
               <span class="status-count">{{ status.count }}</span>
@@ -61,30 +67,39 @@
 
     <div>
       <div class="users-list" v-if="!isResumesLoading && resumes.length">
-      <div v-for="resume in resumes" :key="resume._id" class="user-card">
-        <div class="user-info">
-          <div class="avatar-container">
-            <img :src="resume.user.avatar ? `http://localhost:3000/uploads/avatars/${resume.user.avatar}` : '/images/placeholders/avatar.png'" :alt="resume.user.name" class="user-avatar">
-          </div>
+        <div v-for="resume in resumes" :key="resume._id" class="user-card">
+          <div class="user-info">
+            <div class="avatar-container">
+              <img
+                :src="resume.user.avatar ? `http://localhost:3000/uploads/avatars/${resume.user.avatar}` : '/images/placeholders/avatar.png'"
+                :alt="resume.user.name" class="user-avatar">
+            </div>
 
-          <div class="user-details">
-            <h3 class="user-name">{{ resume.user.lastName }} {{ resume.user.firstName }} {{ resume.user.patronymic }}</h3>
-            <p class="user-specialty">{{ resume.title }}</p>
-            
-            <div class="user-stats">
-              <span class="projects-count">{{ getProjectsString(resume.workExperience.length) }}</span>
-              <span class="divider"></span>
-              <span class="experience-duration">1 год</span>
+            <div class="user-details">
+              <h3 class="user-name">{{ resume.user.lastName }} {{ resume.user.firstName }} {{ resume.user.patronymic }}
+              </h3>
+              <p class="user-specialty">{{ resume.title }}</p>
+
+              <div class="user-stats">
+                <span class="projects-count">{{ getProjectsString(resume.workExperience.length + resume.petProjects.length) }}</span>
+                <span class="divider"></span>
+                <span class="experience-duration">{{ calculateExperience(resume.workExperience) }}</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="user-actions">
-          <a :href="`tel:${resume.user.phoneNumber}`" class="contact-button">
-            Связаться
-          </a>
+          <div class="user-actions">
+            <a :href="`tel:${resume.user.phoneNumber}`" class="contact-button">
+              Связаться
+            </a>
+          </div>
         </div>
       </div>
+
+      <div class="pagination" v-if="!isResumesLoading && resumes.length">
+        <button :disabled="!pagination.hasPrev" @click="prevPage"><</button>
+        <span>{{ pagination.currentPage }} / {{ pagination.totalPages }}</span>
+        <button :disabled="!pagination.hasNext" @click="nextPage">></button>
       </div>
 
       <div class="no-data" v-else-if="!isResumesLoading && !resumes.length">
@@ -124,10 +139,10 @@ export default {
         { ruTitle: "Гибрид", enTitle: "Hybrid" },
       ],
       employmentTypes: [
-        { ruTitle: "Стажер", enTitle:"Intern" },
-        { ruTitle: "Волонтер", enTitle:"Volunteer" },
-        { ruTitle: "На полную занятость", enTitle:"Full-time" },
-        { ruTitle: "На частичную занятость", enTitle:"Part-time" },
+        { ruTitle: "Стажер", enTitle: "Intern" },
+        { ruTitle: "Волонтер", enTitle: "Volunteer" },
+        { ruTitle: "На полную занятость", enTitle: "Full-time" },
+        { ruTitle: "На частичную занятость", enTitle: "Part-time" },
       ],
       statuses: [
         { ruTitle: "Не ищет работу", enTitle: "Not looking", count: 0 },
@@ -135,6 +150,7 @@ export default {
         { ruTitle: "В активном поиске", enTitle: "Actively searching", count: 0 },
       ],
       resumes: [],
+      pagination: {},
       isResumesLoading: false
     }
   },
@@ -146,22 +162,23 @@ export default {
     toggleIndustryFilter() {
       this.showIndustryFilter = !this.showIndustryFilter
     },
-    async loadResumes() {
+    async loadResumes(page = 1) {
       try {
         this.isResumesLoading = true
-        let queryString = ''
-        if(this.selectedIndustries.length) queryString += `industry=${this.selectedIndustries.join()}&`
-        if(this.selectedWorkFormat) queryString += `workFormat=${this.selectedWorkFormat}&`
-        if(this.selectedEmploymentType) queryString += `employmentType=${this.selectedEmploymentType}&`
-        if(this.selectedStatus) queryString += `status=${this.selectedStatus}&`
+        let queryString = `page=${page}&`
+        if (this.selectedIndustries.length) queryString += `industry=${this.selectedIndustries.join()}&`
+        if (this.selectedWorkFormat) queryString += `workFormat=${this.selectedWorkFormat}&`
+        if (this.selectedEmploymentType) queryString += `employmentType=${this.selectedEmploymentType}&`
+        if (this.selectedStatus) queryString += `status=${this.selectedStatus}&`
 
         const res = await axios.get(`http://localhost:3000/resume?${queryString}`)
         this.resumes = res?.data?.resumes
+        this.pagination = res?.data?.pagination
         this.isResumesLoading = false
       } catch (error) {
-          console.error('Ошибка:', error)
-          this.resumes = []
-          this.isResumesLoading = false
+        console.error('Ошибка:', error)
+        this.resumes = []
+        this.isResumesLoading = false
       }
     },
     async loadStatusCounts() {
@@ -190,7 +207,42 @@ export default {
       } else {
         return `${count} проектов`;
       }
-    }
+    },
+    calculateExperience(jobs) {
+      let total = 0;
+      const currentYear = new Date().getFullYear();
+    
+      for (const job of jobs) {
+        const [start, end] = job.period.split('-');
+        const endYear = end === 'настоящее время' ? currentYear : parseInt(end);
+        const startYear = parseInt(start);
+      
+        total += endYear - startYear;
+      }
+    
+      const lastDigit = total % 10;
+      const lastTwoDigits = total % 100;
+
+      if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+        return `${total} лет`;
+      }
+
+      if (lastDigit === 1) {
+        return `${total} год`;
+      }
+
+      if (lastDigit >= 2 && lastDigit <= 4) {
+        return `${total} года`;
+      }
+
+      return `${total} лет`;
+    },
+    prevPage() {
+      this.loadResumes(this.pagination.currentPage-1)
+    },
+    nextPage() {
+      this.loadResumes(this.pagination.currentPage+1)
+    },
   },
   watch: {
     selectedIndustries() {
@@ -215,7 +267,7 @@ export default {
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 0px;
+  padding: 40px 0;
   gap: 93px;
   width: 1026px;
   margin: 0 auto;
@@ -654,6 +706,29 @@ export default {
   right: 0;
 }
 
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.pagination button {
+  background-color: #5E61FF;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+
+  &:disabled {
+    cursor: not-allowed;
+    background-color: #5E61FF9e;
+  }
+}
+
+.pagination span {
+  padding: 0 10px;
+}
+
 .no-data {
   display: flex;
   flex-direction: column;
@@ -688,9 +763,10 @@ export default {
   box-sizing: border-box;
   animation: rotation 1s linear infinite;
 }
+
 .loader::after,
 .loader::before {
-  content: '';  
+  content: '';
   box-sizing: border-box;
   position: absolute;
   left: 0;
@@ -707,25 +783,29 @@ export default {
   animation: rotationBack 0.5s linear infinite;
   transform-origin: center center;
 }
+
 .loader::before {
   width: 32px;
   height: 32px;
   border-color: #FFF #FFF transparent transparent;
   animation: rotation 1.5s linear infinite;
 }
-    
+
 @keyframes rotation {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
-} 
+}
+
 @keyframes rotationBack {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(-360deg);
   }
@@ -743,29 +823,29 @@ export default {
     gap: 40px;
     flex-direction: column;
   }
-  
+
   .filters-sidebar {
     width: 100%;
   }
-  
+
   .users-list {
     width: 100%;
   }
-  
+
   .user-card {
     width: 100%;
     gap: 40px;
     padding: 24px;
   }
-  
+
   .industry-dropdown {
     width: 100%;
   }
-  
+
   .user-actions {
     width: 140px;
   }
-  
+
   .contact-button {
     width: 140px;
   }
@@ -777,16 +857,16 @@ export default {
     height: auto;
     gap: 24px;
   }
-  
+
   .user-info {
     width: 100%;
   }
-  
+
   .user-actions {
     width: 100%;
     align-items: stretch;
   }
-  
+
   .contact-button {
     width: 100%;
   }
