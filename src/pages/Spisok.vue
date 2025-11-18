@@ -59,7 +59,8 @@
       </div>
     </div>
 
-    <div class="users-list">
+    <div>
+      <div class="users-list" v-if="!isResumesLoading && resumes.length">
       <div v-for="resume in resumes" :key="resume._id" class="user-card">
         <div class="user-info">
           <div class="avatar-container">
@@ -83,6 +84,15 @@
             Связаться
           </a>
         </div>
+      </div>
+      </div>
+
+      <div class="no-data" v-else-if="!isResumesLoading && !resumes.length">
+        По вашим фильтрам резюме не найдено. Попробуйте поменять фильтры.
+      </div>
+
+      <div class="loader-container" v-else>
+        <span class="loader"></span>
       </div>
     </div>
   </div>
@@ -124,7 +134,8 @@ export default {
         { ruTitle: "Рассмотрит оффер", enTitle: "Open to offers", count: 0 },
         { ruTitle: "В активном поиске", enTitle: "Actively searching", count: 0 },
       ],
-      resumes: []
+      resumes: [],
+      isResumesLoading: false
     }
   },
   mounted() {
@@ -137,6 +148,7 @@ export default {
     },
     async loadResumes() {
       try {
+        this.isResumesLoading = true
         let queryString = ''
         if(this.selectedIndustries.length) queryString += `industry=${this.selectedIndustries.join()}&`
         if(this.selectedWorkFormat) queryString += `workFormat=${this.selectedWorkFormat}&`
@@ -145,9 +157,11 @@ export default {
 
         const res = await axios.get(`http://localhost:3000/resume?${queryString}`)
         this.resumes = res?.data?.resumes
+        this.isResumesLoading = false
       } catch (error) {
           console.error('Ошибка:', error)
           this.resumes = []
+          this.isResumesLoading = false
       }
     },
     async loadStatusCounts() {
@@ -218,6 +232,7 @@ export default {
   order: 0;
   flex-grow: 0;
   position: sticky;
+  top: 70px;
   height: 100%;
 }
 
@@ -637,6 +652,83 @@ export default {
   color: #989898;
   position: absolute;
   right: 0;
+}
+
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0px;
+  gap: 32px;
+  width: 662px;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 125%;
+  color: #262626;
+}
+
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0px;
+  gap: 32px;
+  width: 662px;
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  border: 3px solid;
+  border-color: #FFF #FFF transparent transparent;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+.loader::after,
+.loader::before {
+  content: '';  
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  border: 3px solid;
+  border-color: transparent transparent #5E61FF #5E61FF;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  animation: rotationBack 0.5s linear infinite;
+  transform-origin: center center;
+}
+.loader::before {
+  width: 32px;
+  height: 32px;
+  border-color: #FFF #FFF transparent transparent;
+  animation: rotation 1.5s linear infinite;
+}
+    
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+} 
+@keyframes rotationBack {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
 }
 
 * {
