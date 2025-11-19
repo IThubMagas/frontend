@@ -17,12 +17,12 @@
       </nav>
     </div>
 
-    <div class="resume-container">
+    <div class="resume-container" v-if="resume">
       <!-- Заголовок с фото и основной информацией -->
-      <div class="header-card">
+      <div class="header-card" id="general">
         <div class="profile-section">
           <div class="photo-container">
-            <img :src="resume.user.avatar || 'https://via.placeholder.com/120'" alt="Фото" class="profile-photo" />
+            <img :src="`http://localhost:3000/uploads/avatars/${resume.user.avatar}` || 'https://via.placeholder.com/120'" alt="Фото" class="profile-photo" />
             <button @click="openModal('photo')" class="edit-photo-btn" title="Изменить фото">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
@@ -97,7 +97,7 @@
         </div>
 
         <!-- О себе -->
-        <section class="section">
+        <section class="section" id="aboutMe">
           <div class="section-header">
             <h2 class="section-title">О себе</h2>
             <button @click="openModal('description')" class="btn-icon edit-btn" title="Редактировать раздел">
@@ -201,7 +201,7 @@
       </section>
 
       <!-- Языки -->
-      <section class="section">
+      <section class="section" id="languages">
         <div class="section-header">
           <h2 class="section-title">Языки</h2>
           <button @click="openModal('language')" class="btn btn-add">
@@ -239,7 +239,7 @@
       </section>
 
       <!-- Опыт работы -->
-      <section class="section">
+      <section class="section" id="workExperience">
         <div class="section-header">
           <h2 class="section-title">Опыт работы</h2>
           <button @click="openModal('workExperience')" class="btn btn-add">
@@ -389,6 +389,10 @@
         </div>
       </div>
     </div>
+
+    <div class="loader-container" v-else>
+        <span class="loader"></span>
+      </div>
   </div>
 
 </template>
@@ -400,12 +404,12 @@ import { useRoute } from 'vue-router';
 
 const activeMenuItem = ref(0);
 const menuItems = [
-  { title: 'Общее', id: "", blockId: "" },
-  { title: 'О себе', id: "", blockId: "" },
+  { title: 'Общее', id: "general", blockId: "" },
+  { title: 'О себе', id: "aboutMe", blockId: "" },
   { title: 'Образование', id: "education", blockId: "" },
   { title: 'Навыки', id: "skills", blockId: "" },
-  { title: 'Языки', id: "", blockId: "" },
-  { title: 'Опыт работы', id: "", blockId: "" },
+  { title: 'Языки', id: "languages", blockId: "" },
+  { title: 'Опыт работы', id: "workExperience", blockId: "" },
 ];
 
 const setActiveMenuItem = (index) => {
@@ -420,8 +424,8 @@ id.value = route.params.id;
 async function loadResume() {
   try {
     const res = await axios.get(`http://localhost:3000/resume/${id.value}`)
-    console.log(res.data.resume);
     resume.value = res.data.resume
+    console.log(res.data.resume);
     
   } catch (error) {
     console.error(error);
@@ -429,78 +433,7 @@ async function loadResume() {
 }
 
 
-const resume = ref({
-  contacts: {
-    email: "john.doe@example.com",
-    phone: "+79289177234",
-    telegram: "https://t.me/test",
-    github: "https://github.com/Spector323"
-  },
-  _id: "69131c2af93d9c74d1a99a78",
-  user: {
-    _id: "690afc84d6dc1f97a1227e30",
-    firstName: "Ахмед",
-    lastName: "Мартазанов",
-    age: 20,
-    avatar: "ava.png"
-  },
-  title: "Senior Software Engineer",
-  description: "Чаще всего работал на языке Javascript.  Но по моей инициативе для решения проблемы связанной с ограничениями языка, к нам в проект были добавлены микросервисы на Typescript. Также для контроля версий подключили Git. Да у меня отсутствует опыт работы в крупных it компаниях с бюрократией, трэкингом задач, могу ошибаться в технических терминах. Но предлагаю вам рассмотреть это как плюс, так как в небольших компаниях идет большая ответственность за свою работу, а остальное я изучу на практике со скоростью света.",
-  workExperience: [
-    {
-      title: "Frontend Developer",
-      company: "Tech Solutions Inc.",
-      period: "2020-2023",
-      achievements: "Разработал и внедрил новую систему компонентов, что увеличило скорость разработки на 40%"
-    },
-    {
-      title: "Junior Web Developer",
-      company: "Digital Agency Pro",
-      period: "2018-2020",
-      achievements: "Разработал и внедрил новую систему компонентов, что увеличило скорость разработки на 40%"
-    },
-    {
-      title: "Software Engineer",
-      company: "Innovation Labs",
-      period: "2023-настоящее время",
-      achievements: "Разработал и внедрил новую систему компонентов, что увеличило скорость разработки на 40%"
-    }
-  ],
-  education: [
-    {
-      degree: "Bachelor of Science",
-      field: "Computer Science",
-      institution: "University of Technology",
-      year: 2018
-    },
-    {
-      degree: "Master of Science",
-      field: "Software Engineering",
-      institution: "Tech Institute",
-      year: 2020
-    }
-  ],
-  skills: [
-    "JavaScript",
-    "TypeScript",
-    "React",
-    "Node.js",
-    "MongoDB",
-    "AWS",
-    "Docker",
-    "Git"
-  ],
-  languages: [
-    {
-      language: "Russian",
-      level: "Beginner"
-    }
-  ],
-  isPublic: true,
-  createdAt: "2025-11-11T11:21:14.869Z",
-  updatedAt: "2025-11-12T12:52:09.687Z",
-  __v: 0
-});
+const resume = ref(null);
 
 onMounted(() => {
   loadResume()
