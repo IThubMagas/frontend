@@ -92,7 +92,16 @@
             </label>
             <label>
               <p class="px-[16px] text-sm mb-[6px]">Телефон</p>
-              <input v-model="formData.phoneNumber" class="h-[48px] w-full px-[16px] bg-[#F2F2F2] rounded-md" type="tel" placeholder="+7 (999) 123-45-67">
+              <input 
+                v-model="formData.phoneNumber" 
+                @input="formatPhoneNumber"
+                @blur="validatePhoneNumber"
+                class="h-[48px] w-full px-[16px] bg-[#F2F2F2] rounded-md" 
+                type="tel" 
+                placeholder="+7 (999) 123-45-67"
+                :class="{ 'border border-red-500': phoneError }"
+              >
+              <p v-if="phoneError" class="text-red-500 text-xs mt-1 px-[16px]">{{ phoneError }}</p>
             </label>
             <label>
               <p class="px-[16px] text-sm mb-[6px]">Пароль</p>
@@ -103,7 +112,11 @@
               <input v-model="formData.confirmPassword" class="h-[48px] w-full px-[16px] bg-[#F2F2F2] rounded-md" type="password" required>
             </label>
 
-            <button type="submit" :disabled="loading" class="h-[40px] mt-4 rounded-md bg-[#007AFF] text-white text-[15px] font-bold">
+            <button 
+              type="submit" 
+              :disabled="loading || phoneError" 
+              class="h-[40px] mt-4 rounded-md bg-[#007AFF] text-white text-[15px] font-bold disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
               {{ loading ? 'Регистрация...' : 'Зарегистрироваться' }}
             </button>
 
@@ -161,11 +174,9 @@
             <button type="submit" :disabled="loading" class="h-[40px] rounded-md bg-[#007AFF] text-white text-[15px] font-bold">
               {{ loading ? 'Сброс...' : 'Сбросить пароль' }}
             </button>
-            <divures>
             <div class="text-center">
               <span class="text-[#007AFF] cursor-pointer text-sm" @click="switchTo('login')">Вернуться ко входу</span>
             </div>
-            </divures>
           </form>
         </div>
       </div>
@@ -310,6 +321,62 @@ const resendCode = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const validatePhoneNumber = () => {
+  if (!formData.phoneNumber) {
+    phoneError.value = ''
+    return true
+  }
+
+  // Очищаем номер от всего, кроме цифр
+  const cleanPhone = formData.phoneNumber.replace(/\D/g, '')
+  
+  // Проверяем российские номера (начинаются с 7 или 8, длина 11 цифр)
+  if (cleanPhone.startsWith('7') || cleanPhone.startsWith('8')) {
+    if (cleanPhone.length === 11) {
+      phoneError.value = ''
+      return true
+    } else {
+      phoneError.value = 'Номер должен содержать 11 цифр'
+      return false
+    }
+  }
+  
+  // Для международных номеров - минимальная длина 10 цифр
+  if (cleanPhone.length >= 10 && cleanPhone.length <= 15) {
+    phoneError.value = ''
+    return true
+  } else {
+    phoneError.value = 'Номер должен содержать от 10 до 15 цифр'
+    return false
+  }
+}
+
+// Форматирование номера телефона
+const formatPhoneNumber = () => {
+  if (!formData.phoneNumber) return
+  
+  // Удаляем все нецифровые символы
+  let numbers = formData.phoneNumber.replace(/\D/g, '')
+  
+  // Ограничиваем длину
+  numbers = numbers.substring(0, 11)
+  
+  // Форматируем номер в российском формате
+  let formatted = ''
+  if (numbers.startsWith('7') || numbers.startsWith('8')) {
+    if (numbers.length >= 1) formatted = `+7`
+    if (numbers.length >= 2) formatted += ` (${numbers.substring(1, 4)}`
+    if (numbers.length >= 5) formatted += `) ${numbers.substring(4, 7)}`
+    if (numbers.length >= 8) formatted += `-${numbers.substring(7, 9)}`
+    if (numbers.length >= 10) formatted += `-${numbers.substring(9, 11)}`
+  } else {
+    // Для других форматов просто используем цифры
+    formatted = numbers
+  }
+  
+  formData.phoneNumber = formatted
 }
 
 
