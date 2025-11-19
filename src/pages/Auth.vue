@@ -198,7 +198,7 @@ const formData = reactive({
   resetCode: ''
 })
 
-const API_URL = 'http://localhost:5000/auth'
+const API_URL = 'http://localhost:3000/auth'
 
 
 const switchTo = (mode) => {

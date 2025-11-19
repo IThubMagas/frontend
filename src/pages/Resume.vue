@@ -394,7 +394,9 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive } from 'vue';
+import axios from 'axios';
+import { ref, computed, reactive, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 
 const activeMenuItem = ref(0);
 const menuItems = [
@@ -409,7 +411,25 @@ const menuItems = [
 const setActiveMenuItem = (index) => {
   activeMenuItem.value = index;
 };
-const resume = reactive({
+
+
+const route = useRoute();
+const id = ref(null);
+id.value = route.params.id;
+
+async function loadResume() {
+  try {
+    const res = await axios.get(`http://localhost:3000/resume/${id.value}`)
+    console.log(res.data.resume);
+    resume.value = res.data.resume
+    
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+const resume = ref({
   contacts: {
     email: "john.doe@example.com",
     phone: "+79289177234",
@@ -482,17 +502,21 @@ const resume = reactive({
   __v: 0
 });
 
-const fullName = computed(() => `${resume.user.firstName} ${resume.user.lastName}`);
-const workExperience = computed(() => resume.workExperience || []);
-const education = computed(() => resume.education || []);
-const skills = computed(() => resume.skills || []);
-const languages = computed(() => resume.languages || []);
+onMounted(() => {
+  loadResume()
+})
+
+const fullName = computed(() => `${resume.value.user?.firstName} ${resume.value.user?.lastName}`);
+const workExperience = computed(() => resume.value?.workExperience || []);
+const education = computed(() => resume.value.education || []);
+const skills = computed(() => resume.value.skills || []);
+const languages = computed(() => resume.value.languages || []);
 const hasContacts = computed(() =>
-  resume.contacts && (
-    resume.contacts.email ||
-    resume.contacts.phone ||
-    resume.contacts.telegram ||
-    resume.contacts.github
+  resume.value.contacts && (
+    resume.value.contacts.email ||
+    resume.value.contacts.phone ||
+    resume.value.contacts.telegram ||
+    resume.value.contacts.github
   )
 );
 
@@ -777,7 +801,7 @@ const editItem = (type, index) => {
 <style scoped>
 .app-conent {
   display: flex;
-  margin-top: 100px;
+  margin-top: 40px;
   width: 1260px;
   margin-inline: auto;
   margin-bottom: 100px;
@@ -793,7 +817,7 @@ const editItem = (type, index) => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  width: 240px;
+  width: 268px;
   border-radius: 10px;
   gap: 8px;
 }
@@ -851,7 +875,7 @@ const editItem = (type, index) => {
 .resume-container {
   font-family: "Inter", sans-serif;
   font-optical-sizing: auto;
-  max-width: 700px;
+  /* max-width: 700px; */
   display: flex;
   flex-direction: column;
   margin-inline: auto;

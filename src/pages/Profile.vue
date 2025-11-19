@@ -203,7 +203,7 @@ import axios from 'axios';
  
 async function updateUser(){
     const BEARER_TOKEN = localStorage.getItem("token")
-    const res = await axios.put("http://localhost:5000/auth/profile", {userData: UserData.value},{
+    const res = await axios.put("http://localhost:3000/auth/profile", {userData: UserData.value},{
   headers: {
     'Authorization': `Bearer ${BEARER_TOKEN}`
   }
@@ -249,14 +249,14 @@ onMounted(async () => {
   console.log('Компонент смонтирован в DOM!');
 
   const BEARER_TOKEN = localStorage.getItem("token")
-  const res = await axios.get("http://localhost:5000/auth/profile", {
+  const res = await axios.get("http://localhost:3000/auth/profile", {
   headers: {
     'Authorization': `Bearer ${BEARER_TOKEN}`
   }
 })
 console.log(res);
-UserData.value = res.data
-originalUserData.value = res.data
+UserData.value = res.data.students
+originalUserData.value = res.data.students
 });
 
 

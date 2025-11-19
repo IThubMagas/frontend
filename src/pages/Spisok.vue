@@ -67,7 +67,7 @@
 
     <div>
       <div class="users-list" v-if="!isResumesLoading && resumes.length">
-        <div v-for="resume in resumes" :key="resume._id" class="user-card">
+        <div v-for="resume in resumes" :key="resume._id" class="user-card" @click="goToResume(resume._id)">
           <div class="user-info">
             <div class="avatar-container">
               <img
@@ -89,9 +89,9 @@
           </div>
 
           <div class="user-actions">
-            <a :href="`tel:${resume.user.phoneNumber}`" class="contact-button">
-              Связаться
-            </a>
+            <button class="contact-button" @click.stop="handleContact(resume.user.phoneNumber)">
+                Связаться
+            </button>
           </div>
         </div>
       </div>
@@ -192,6 +192,17 @@ export default {
         }
       }
     },
+    goToResume(resumeId) {
+      this.$router.push({ 
+        name: 'Resume', 
+        params: { 
+          id: resumeId
+        }
+      })
+    },
+    handleContact(phoneNumber) {
+        window.location.href = `tel:${phoneNumber}`;
+    },
     getProjectsString(count) {
       const lastNumber = count % 10;
       const lastTwoNumbers = count % 100;
@@ -269,7 +280,7 @@ export default {
   align-items: flex-start;
   padding: 40px 0;
   gap: 93px;
-  width: 1026px;
+  width: fit-content;
   margin: 0 auto;
 }
 
@@ -278,7 +289,7 @@ export default {
   flex-direction: column;
   align-items: flex-start;
   padding: 0px;
-  gap: 40px;
+  gap: 8px;
   width: 268px;
   flex: none;
   order: 0;
@@ -294,7 +305,7 @@ export default {
   align-items: flex-start;
   padding: 0px;
   gap: 32px;
-  width: 662px;
+  width: 896px;
   flex: none;
   order: 1;
   flex-grow: 0;
@@ -315,6 +326,7 @@ export default {
   flex-grow: 0;
   transition: all 0.3s ease;
   border: 1px solid #f0f0f0;
+  cursor: pointer;
 }
 
 .user-info {
@@ -348,11 +360,10 @@ export default {
 .user-details {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  justify-content: center;
   padding: 0px;
   gap: 8px;
   width: 268px;
-  height: 42px;
   flex: none;
   order: 0;
   align-self: stretch;
@@ -493,14 +504,12 @@ export default {
 }
 
 .filter-title {
-  width: 100px;
   height: 16px;
   font-family: 'Inter';
   font-style: normal;
   font-weight: 600;
   font-size: 16px;
   line-height: 100%;
-  color: #262626;
   flex: none;
   order: 0;
   flex-grow: 0;
@@ -632,10 +641,12 @@ export default {
   flex-direction: column;
   align-items: flex-start;
   padding: 0px;
-  gap: 31px;
+  gap: 15px;
   width: 268px;
   margin-left: 1px;
   border-radius: 8px;
+  background-color: #fff;
+  padding: 10px;
 }
 
 .filter-header {
@@ -646,6 +657,7 @@ export default {
   gap: 10px;
   width: 100%;
   height: 22px;
+  color: #5E61FF;
 }
 
 .filter-options {
@@ -735,7 +747,7 @@ export default {
   align-items: center;
   padding: 0px;
   gap: 32px;
-  width: 662px;
+  width: 896px;
   font-style: normal;
   font-weight: 700;
   font-size: 17px;
@@ -749,7 +761,7 @@ export default {
   align-items: center;
   padding: 0px;
   gap: 32px;
-  width: 662px;
+  width: 896px;
 }
 
 .loader {
