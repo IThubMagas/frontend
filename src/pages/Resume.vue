@@ -57,7 +57,8 @@
             </div>
             <div class="meta-info">
               <div class="meta-item">
-                <span>Возраст: {{ resume.user.age }} лет</span>
+                <span v-if="resume.user.age">Возраст: {{ resume.user.age }} лет</span>
+                <span v-else>Возраст: Не указан</span>
                 <button @click="openModal('age')" class="btn-icon edit-btn small" title="Редактировать возраст">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"

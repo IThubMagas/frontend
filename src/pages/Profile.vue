@@ -1,15 +1,15 @@
 <template>
     <div class="flex justify-center">
-        <div class="mainProfile w-[1026px] flex p-4 mt-[100px] gap-[130px]">
+        <div class="mainProfile w-fit flex mt-[40px] gap-[93px]">
         <div class="min-w-[234px] p-20px">
-            <ul class="flex gap-2 flex-col">
+            <ul class="flex gap-2 flex-col w-[268px]">
                 <li v-for="item in menuProfile" :key="item.menu" class="py-5 pl-5 bg gap-y-1 bg-white text-sm font-semibold">
                     <a href="#">{{ item.menu }}</a>
                 </li>
             </ul>
         </div>
 
-        <div class="profile-main min-w-[662px]">
+        <div class="profile-main min-w-[896px]">
             <div class="profile-header">
                 <h2 class="text-[32px] font-semibold">Мой профиль</h2>
                     <div class="profile-avatar flex mt-8 items-center gap-6 ">
@@ -22,27 +22,27 @@
             </div>
 
             <div class="flex gap-3 mt-[60px]">
-                <div class="data-lastname max-h-[76px]">
+                <div class="data-lastname max-h-[76px] w-[33%]">
                         <p class="font-semibold">Фамилия</p>
-                        <input v-model="UserData.lastName" class="max-w-[212px] max-h-12 mt-1 p-3 rounded-lg" type="text" placeholder="Введите фамилию">
+                        <input v-model="UserData.lastName" class="w-[100%] max-h-12 mt-1 p-3 rounded-lg" type="text" placeholder="Введите фамилию">
                 </div>
-                <div class="data-name max-h-[76px]">
+                <div class="data-name max-h-[76px] w-[33%]">
                         <p class="font-semibold">Имя</p>
-                        <input v-model="UserData.firstName" class="max-w-[212px] max-h-12 mt-1 p-3 rounded-lg" type="text" placeholder="Введите имя">
+                        <input v-model="UserData.firstName" class="w-[100%] max-h-12 mt-1 p-3 rounded-lg" type="text" placeholder="Введите имя">
                 </div>
-                <div class="data-surname max-h-[76px]">
+                <div class="data-surname max-h-[76px] w-[33%]">
                         <p class="font-semibold">Отчество</p>
-                        <input v-model="UserData.patronymic" class="max-w-[212px] max-h-12 mt-1 p-3 rounded-lg" type="text" placeholder="Введите отчество">
+                        <input v-model="UserData.patronymic" class="w-[100%] max-h-12 mt-1 p-3 rounded-lg" type="text" placeholder="Введите отчество">
                 </div>
             </div>
             <div class="flex gap-3 mt-8">
-                <div class="max-h-[76px]">
+                <div class="max-h-[76px] w-[50%]">
                         <p class="font-semibold">Возраст</p>
-                        <input v-model="UserData.age" class="min-w-[325px] max-h-12 mt-1 p-3 rounded-lg" type="number" placeholder="Введите возраст">
+                        <input v-model="UserData.age" class="w-[100%] max-h-12 p-3 rounded-lg" type="number" placeholder="Введите возраст">
                 </div>
-                <div class="max-h-[76px]">
+                <div class="max-h-[76px] w-[50%]">
                         <p class="font-semibold">Населнный пункт</p>
-                        <input v-model="UserData.city" class="min-w-[325px] max-h-12 c p-3 rounded-lg" type="text" placeholder="Введите город">
+                        <input v-model="UserData.city" class="w-[100%] max-h-12 c p-3 rounded-lg" type="text" placeholder="Введите город">
                 </div>
             </div>
             
