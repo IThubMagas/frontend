@@ -1,10 +1,12 @@
 <template>
   <Header></Header>
   <router-view />
+  <Footer></Footer>
 </template>
 
 <script setup>
 import Header from './components/Header.vue';
+import Footer from './components/Footer.vue';
 import axios from 'axios';
 const token = localStorage.getItem('token') || sessionStorage.getItem('token')
 if (token) {
