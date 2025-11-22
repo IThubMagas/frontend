@@ -157,7 +157,6 @@ const isDarkMode = ref(false);
 
 const toggleTheme = () => {
   isDarkMode.value = !isDarkMode.value;
-  // Здесь должна быть логика смены темы для всего сайта
 };
 </script>
 
@@ -168,18 +167,15 @@ const toggleTheme = () => {
   background-color: #f4f5f6;
   padding: 60px 0 40px;
   font-family: "Unbounded", sans-serif;
-  z-index: 1000;
 }
 
 .footer-content {
-  min-width: 1260px;
-  max-width: 1260px;
+  width: 1260px;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 50px;
-  padding: 0 20px;
 }
 
 .logo {

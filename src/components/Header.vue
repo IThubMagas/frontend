@@ -1,104 +1,272 @@
 <template>
-    <header class="header">
-        <div class="header-container">
-            <div class="logo">
-                HRhub
-            </div>
+  <header class="header">
+    <div class="header__container">
+      <router-link to="/" class="header__logo">
+        HRhub
+      </router-link>
 
-            <nav class="nav">
-                <div class="nav-bl">
-                    <router-link to="/" class="nav-link">Главная</router-link>
-                    <router-link to="/services" class="nav-link">Специалисты</router-link>
-                    <router-link to="/about" class="nav-link">О нас</router-link>
-                </div>
-                <router-link to="/auth" class="login-link">
-                    <span class="login-text">Вход</span>
-                </router-link>
-            </nav>
-
+      <nav class="header__nav">
+        <div class="nav__links">
+          <router-link to="/" class="nav__link">Главная</router-link>
+          <router-link to="/services" class="nav__link">Специалисты</router-link>
+          <router-link to="/about" class="nav__link">О нас</router-link>
         </div>
-    </header>
+        
+        <div v-if="isAuthenticated" class="user-menu">
+          <router-link to="/profile" class="user-profile-link">
+            <div class="user-avatar">
+              <div v-if="user.avatar" class="avatar-img" :style="{ backgroundImage: `url(${user.avatar})` }"></div>
+              <div v-else class="avatar-placeholder">{{ userInitials }}</div>
+            </div>
+            <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
+          </router-link>
+          <button class="logout-btn" @click="handleLogout">
+            Выйти
+          </button>
+        </div>
+        
+        <router-link v-else to="/auth" class="login-btn">
+          Вход
+        </router-link>
+      </nav>
+    </div>
+  </header>
 </template>
 
 <script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+
+const router = useRouter()
+const isAuthenticated = ref(false)
+const user = ref({
+  firstName: '',
+  lastName: '',
+  avatar: null
+})
+
+const API_URL = 'http://localhost:3000/auth'
+
+const userInitials = computed(() => {
+  const { firstName, lastName } = user.value
+  return firstName && lastName ? `${firstName[0]}${lastName[0]}`.toUpperCase() : 'U'
+})
+
+onMounted(() => {
+  checkAuth()
+})
+
+const fetchUserProfile = async () => {
+  try {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token')
+    if (!token) return null
+    
+    const res = await axios.get(`${API_URL}/profile`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    
+    const userData = {
+      firstName: res.data.students?.firstName || 'Пользователь',
+      lastName: res.data.students?.lastName || '',
+      avatar: res.data.students?.avatar || null
+    }
+    
+    localStorage.setItem('user', JSON.stringify(userData))
+    return userData
+  } catch (error) {
+    console.error('Ошибка получения профиля:', error)
+    return null
+  }
+}
+
+const checkAuth = async () => {
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token')
+  const userData = localStorage.getItem('user')
+  
+  if (token) {
+    if (userData) {
+      user.value = JSON.parse(userData)
+      isAuthenticated.value = true
+    } else {
+      const profile = await fetchUserProfile()
+      if (profile) {
+        user.value = profile
+        isAuthenticated.value = true
+      }
+    }
+  }
+}
+
+const clearAuthData = () => {
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
+  sessionStorage.removeItem('token')
+  sessionStorage.removeItem('user')
+}
+
+const handleLogout = () => {
+  clearAuthData()
+  isAuthenticated.value = false
+  user.value = { firstName: '', lastName: '', avatar: null }
+  router.push('/')
+}
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&display=swap');
-
 .header {
-    background: #ffffff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    border-radius: 8px;
-    top: 0;
-    z-index: 1000;
+  background: #fff;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.9);
 }
 
-.header-container {
-    max-width: 1260px;
-    margin-inline: auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 70px;
+.header__container {
+  max-width: 1260px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+  padding: 0 20px;
 }
 
-.logo {
-    font-family: "Unbounded", sans-serif;
-    font-optical-sizing: auto;
-    font-style: normal;
-    font-size: 32px;
-    font-weight: 600;
-    color: #5E61FF;
-    letter-spacing: -0.5px;
+.header__logo {
+  font-family: "Unbounded", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #5E61FF, #8B5CF6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-decoration: none;
 }
 
-.nav {
-    display: flex;
-    gap: 113px;
-    align-items: center;
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: 40px;
 }
 
-.nav-bl {
-    display: flex;
-    gap: 26px;
+.nav__links {
+  display: flex;
+  gap: 24px;
 }
 
-.nav-link {
-    text-decoration: none;
-    color: #2d3748;
-    font-weight: 500;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    position: relative;
-    padding: 10px;
+.nav__link {
+  color: #4B5563;
+  font-weight: 500;
+  font-size: 15px;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
-.nav-link:hover {
-    color: #667eea;
+.nav__link:hover {
+  color: #5E61FF;
+  background: rgba(94, 97, 255, 0.05);
 }
 
-.login-link {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    background: #5E61FF;
-    color: white;
-    padding: 10px 40px;
-    border-radius: 4px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+.nav__link.router-link-active {
+  color: #5E61FF;
+  font-weight: 600;
 }
 
-.login-link:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+.login-btn {
+  background: linear-gradient(135deg, #5E61FF, #8B5CF6);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(94, 97, 255, 0.25);
 }
 
-.login-text {
-    font-size: 16px;
+.login-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(94, 97, 255, 0.35);
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-profile-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(229, 231, 235, 0.8);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.user-profile-link:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(94, 97, 255, 0.2);
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #5E61FF, #8B5CF6);
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #1F2937;
+  font-size: 14px;
+  white-space: nowrap;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logout-btn {
+  background: #EF4444;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: #DC2626;
+  transform: translateY(-1px);
 }
 </style>

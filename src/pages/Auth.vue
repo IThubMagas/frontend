@@ -1,197 +1,441 @@
 <template>
-  <div class="max-w-[1440px] h-screen mx-auto flex flex-col lg:flex-row">
-    <!-- Левый блок -->
-    <div class="lg:w-[68.33%] h-full">
-      <img src="/auth/banner.png" alt="Banner" class="w-full h-full object-cover">
+  <div class="auth-container">
+    <div class="auth-background">
+      <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+        <div class="shape shape-5"></div>
+      </div>
+      <div class="glowing-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+      </div>
     </div>
 
-    <!-- Правый блок -->
-    <div class="w-full lg:w-[31.67%] h-screen p-[48px] overflow-y-auto">
-      <div class="flex flex-col gap-[48px]">
-        <img src="/auth/logo.png" alt="logo" class="h-[48px]">
+    <div class="auth-card">
+      <div class="card-header">
+        <div class="mode-tabs">
+          <button 
+            class="tab-btn" 
+            :class="{ active: currentMode === 'login' }"
+            @click="switchTo('login')"
+          >
+            Вход
+          </button>
+          <button 
+            class="tab-btn" 
+            :class="{ active: currentMode === 'signup' }"
+            @click="switchTo('signup')"
+          >
+            Регистрация
+          </button>
+        </div>
+      </div>
 
-        <div>
-          <!-- Заголовки -->
-          <h2 class="font-bold text-[22px]" v-if="currentMode === 'login'">
-            Приятно видеть вас снова
-          </h2>
-          <h2 class="font-bold text-[22px]" v-else-if="currentMode === 'signup'">
-            Создайте аккаунт
-          </h2>
-          <h2 class="font-bold text-[22px]" v-else-if="currentMode === 'verify'">
-            Подтвердите email
-          </h2>
-          <h2 class="font-bold text-[22px]" v-else-if="currentMode === 'forgot'">
-            Восстановление пароля
-          </h2>
-          <h2 class="font-bold text-[22px]" v-else-if="currentMode === 'reset'">
-            Сброс пароля
-          </h2>
+      <div class="card-body">
+        <transition name="form-slide" mode="out-in">
+          <div v-if="currentMode === 'login'" class="form-wrapper">
+            <h2 class="form-title">Добро пожаловать!</h2>
+            <p class="form-subtitle">Войдите в свой аккаунт</p>
 
-          <!-- Уведомления -->
-          <div v-if="message" :class="['text-sm p-3 rounded-md mb-4', error ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700']">
-            {{ message }}
+            <form @submit.prevent="handleLogin" class="auth-form">
+              <div class="input-group">
+                <div class="input-wrapper">
+                  <input 
+                    v-model="formData.email" 
+                    type="email" 
+                    placeholder=" "
+                    class="form-input"
+                    required
+                  >
+                  <label class="input-label">Email</label>
+                  <div class="input-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2"/>
+                      <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="input-group">
+                <div class="input-wrapper">
+                  <input 
+                    v-model="formData.password" 
+                    type="password" 
+                    placeholder=" "
+                    class="form-input"
+                    required
+                  >
+                  <label class="input-label">Пароль</label>
+                  <div class="input-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 15V17M6 21H18C19.1046 21 20 20.1046 20 19V13C20 11.8954 19.1046 11 18 11H6C4.89543 11 4 11.8954 4 13V19C4 20.1046 4.89543 21 6 21Z" stroke="currentColor" stroke-width="2"/>
+                      <path d="M16 11V7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7V11" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-options">
+                <label class="checkbox">
+                  <input type="checkbox" v-model="rememberMe" class="checkbox-input">
+                  <span class="checkmark"></span>
+                  Запомнить меня
+                </label>
+                <button type="button" class="text-link" @click="switchTo('forgot')">
+                  Забыли пароль?
+                </button>
+              </div>
+
+              <button type="submit" class="submit-btn" :disabled="loading">
+                <span v-if="loading" class="btn-loading">
+                  <div class="spinner"></div>
+                  Вход...
+                </span>
+                <span v-else>Войти</span>
+              </button>
+
+              <div class="divider">
+                <span>или</span>
+              </div>
+
+              <button type="button" class="social-btn google-btn" @click="handleGoogleSignIn">
+                <div class="social-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                  </svg>
+                </div>
+                Войти через Google
+              </button>
+
+              <div class="form-footer">
+                <p>Нет аккаунта? 
+                  <button type="button" class="text-link" @click="switchTo('signup')">
+                    Зарегистрироваться
+                  </button>
+                </p>
+              </div>
+            </form>
           </div>
 
-          <!-- Форма логина -->
-          <form v-if="currentMode === 'login'" @submit.prevent="handleLogin" class="mt-[24px] flex flex-col gap-[16px]">
-            <label>
-              <p class="px-[16px] text-sm mb-[6px]">Email</p>
-              <input v-model="formData.email" class="h-[48px] w-full px-[16px] bg-[#F2F2F2] rounded-md" type="email" placeholder="Введите email" required>
-            </label>
-            <label>
-              <p class="px-[16px] text-sm mb-[6px]">Пароль</p>
-              <input v-model="formData.password" class="h-[48px] w-full px-[16px] bg-[#F2F2F2] rounded-md" type="password" placeholder="Введите пароль" required>
-            </label>
+          <div v-else-if="currentMode === 'signup'" class="form-wrapper">
+            <h2 class="form-title">Создайте аккаунт</h2>
+            <p class="form-subtitle">Присоединяйтесь к нашему сообществу</p>
 
-            <div class="flex justify-between mt-[4px]">
-              <div class="flex gap-2 items-center">
-                <label class="switch">
-                  <input type="checkbox" v-model="rememberMe" class="switch-input">
-                  <span class="switch-slider"></span>
-                </label>
-                <p class="text-sm cursor-pointer" @click="rememberMe = !rememberMe">Запомнить меня</p>
+            <form @submit.prevent="handleSignup" class="auth-form">
+              <div class="name-grid">
+                <div class="input-group">
+                  <div class="input-wrapper">
+                    <input 
+                      v-model="formData.firstName" 
+                      type="text" 
+                      placeholder=" "
+                      class="form-input"
+                      required
+                    >
+                    <label class="input-label">Имя</label>
+                    <div class="input-icon">
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M20 21V19C20 16.7909 18.2091 15 16 15H8C5.79086 15 4 16.7909 4 19V21" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="currentColor" stroke-width="2"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="input-group">
+                  <div class="input-wrapper">
+                    <input 
+                      v-model="formData.lastName" 
+                      type="text" 
+                      placeholder=" "
+                      class="form-input"
+                      required
+                    >
+                    <label class="input-label">Фамилия</label>
+                    <div class="input-icon">
+                      <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M20 21V19C20 16.7909 18.2091 15 16 15H8C5.79086 15 4 16.7909 4 19V21" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="currentColor" stroke-width="2"/>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <p class="text-[#007AFF] cursor-pointer text-sm" @click="switchTo('forgot')">Забыли пароль?</p>
+
+              <div class="input-group">
+                <div class="input-wrapper">
+                  <input 
+                    v-model="formData.email" 
+                    type="email" 
+                    placeholder=" "
+                    class="form-input"
+                    required
+                  >
+                  <label class="input-label">Email</label>
+                  <div class="input-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2"/>
+                      <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="input-group">
+                <div class="input-wrapper">
+                  <input 
+                    v-model="formData.password" 
+                    type="password" 
+                    placeholder=" "
+                    class="form-input"
+                    required
+                  >
+                  <label class="input-label">Пароль</label>
+                  <div class="input-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 15V17M6 21H18C19.1046 21 20 20.1046 20 19V13C20 11.8954 19.1046 11 18 11H6C4.89543 11 4 11.8954 4 13V19C4 20.1046 4.89543 21 6 21Z" stroke="currentColor" stroke-width="2"/>
+                      <path d="M16 11V7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7V11" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="input-group">
+                <div class="input-wrapper">
+                  <input 
+                    v-model="formData.confirmPassword" 
+                    type="password" 
+                    placeholder=" "
+                    class="form-input"
+                    required
+                  >
+                  <label class="input-label">Подтвердите пароль</label>
+                  <div class="input-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 15V17M6 21H18C19.1046 21 20 20.1046 20 19V13C20 11.8954 19.1046 11 18 11H6C4.89543 11 4 11.8954 4 13V19C4 20.1046 4.89543 21 6 21Z" stroke="currentColor" stroke-width="2"/>
+                      <path d="M16 11V7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7V11" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="submit-btn" :disabled="loading">
+                <span v-if="loading" class="btn-loading">
+                  <div class="spinner"></div>
+                  Регистрация...
+                </span>
+                <span v-else>Создать аккаунт</span>
+              </button>
+
+              <div class="form-footer">
+                <p>Уже есть аккаунт? 
+                  <button type="button" class="text-link" @click="switchTo('login')">
+                    Войти
+                  </button>
+                </p>
+              </div>
+            </form>
+          </div>
+
+          <div v-else-if="currentMode === 'verify'" class="form-wrapper">
+            <h2 class="form-title">Подтверждение email</h2>
+            <p class="form-subtitle">Введите код из письма</p>
+
+            <form @submit.prevent="handleVerifyEmail" class="auth-form">
+              <div class="input-group">
+                <div class="input-wrapper">
+                  <input 
+                    v-model="formData.verificationCode" 
+                    type="text" 
+                    placeholder=" "
+                    class="form-input text-center"
+                    maxlength="6"
+                    required
+                  >
+                  <label class="input-label">Код подтверждения</label>
+                  <div class="input-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M9 12L11 14L15 10M12 3H5C4.46957 3 3.96086 3.21071 3.58579 3.58579C3.21071 3.96086 3 4.46957 3 5V19C3 19.5304 3.21071 20.0391 3.58579 20.4142C3.96086 20.7893 4.46957 21 5 21H19C19.5304 21 20.0391 20.7893 20.4142 20.4142C20.7893 20.0391 21 19.5304 21 19V12" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="submit-btn" :disabled="loading">
+                <span v-if="loading" class="btn-loading">
+                  <div class="spinner"></div>
+                  Проверка...
+                </span>
+                <span v-else>Подтвердить</span>
+              </button>
+
+              <div class="form-footer">
+                <p>Не пришло письмо? 
+                  <button type="button" class="text-link" @click="resendCode">
+                    Отправить снова
+                  </button>
+                </p>
+              </div>
+            </form>
+          </div>
+
+          <div v-else-if="currentMode === 'forgot'" class="form-wrapper">
+            <h2 class="form-title">Восстановление пароля</h2>
+            <p class="form-subtitle">Введите email для сброса пароля</p>
+
+            <form @submit.prevent="handleForgot" class="auth-form">
+              <div class="input-group">
+                <div class="input-wrapper">
+                  <input 
+                    v-model="formData.email" 
+                    type="email" 
+                    placeholder=" "
+                    class="form-input"
+                    required
+                  >
+                  <label class="input-label">Email</label>
+                  <div class="input-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2"/>
+                      <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="submit-btn" :disabled="loading">
+                <span v-if="loading" class="btn-loading">
+                  <div class="spinner"></div>
+                  Отправка...
+                </span>
+                <span v-else>Отправить код</span>
+              </button>
+
+              <div class="form-footer">
+                <button type="button" class="text-link" @click="switchTo('login')">
+                  Вернуться ко входу
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div v-else-if="currentMode === 'reset'" class="form-wrapper">
+            <h2 class="form-title">Сброс пароля</h2>
+            <p class="form-subtitle">Введите код и новый пароль</p>
+
+            <form @submit.prevent="handleReset" class="auth-form">
+              <div class="input-group">
+                <div class="input-wrapper">
+                  <input 
+                    v-model="formData.resetCode" 
+                    type="text" 
+                    placeholder=" "
+                    class="form-input text-center"
+                    maxlength="6"
+                    required
+                  >
+                  <label class="input-label">Код сброса</label>
+                  <div class="input-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M9 12L11 14L15 10M12 3H5C4.46957 3 3.96086 3.21071 3.58579 3.58579C3.21071 3.96086 3 4.46957 3 5V19C3 19.5304 3.21071 20.0391 3.58579 20.4142C3.96086 20.7893 4.46957 21 5 21H19C19.5304 21 20.0391 20.7893 20.4142 20.4142C20.7893 20.0391 21 19.5304 21 19V12" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="input-group">
+                <div class="input-wrapper">
+                  <input 
+                    v-model="formData.password" 
+                    type="password" 
+                    placeholder=" "
+                    class="form-input"
+                    required
+                  >
+                  <label class="input-label">Новый пароль</label>
+                  <div class="input-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 15V17M6 21H18C19.1046 21 20 20.1046 20 19V13C20 11.8954 19.1046 11 18 11H6C4.89543 11 4 11.8954 4 13V19C4 20.1046 4.89543 21 6 21Z" stroke="currentColor" stroke-width="2"/>
+                      <path d="M16 11V7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7V11" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="input-group">
+                <div class="input-wrapper">
+                  <input 
+                    v-model="formData.confirmPassword" 
+                    type="password" 
+                    placeholder=" "
+                    class="form-input"
+                    required
+                  >
+                  <label class="input-label">Подтвердите пароль</label>
+                  <div class="input-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 15V17M6 21H18C19.1046 21 20 20.1046 20 19V13C20 11.8954 19.1046 11 18 11H6C4.89543 11 4 11.8954 4 13V19C4 20.1046 4.89543 21 6 21Z" stroke="currentColor" stroke-width="2"/>
+                      <path d="M16 11V7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7V11" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="submit-btn" :disabled="loading">
+                <span v-if="loading" class="btn-loading">
+                  <div class="spinner"></div>
+                  Сброс...
+                </span>
+                <span v-else>Сбросить пароль</span>
+              </button>
+
+              <div class="form-footer">
+                <button type="button" class="text-link" @click="switchTo('login')">
+                  Вернуться ко входу
+                </button>
+              </div>
+            </form>
+          </div>
+        </transition>
+
+        <transition name="notification">
+          <div v-if="message" :class="['notification', error ? 'error' : 'success']">
+            <div class="notification-content">
+              <div class="notification-icon">
+                <svg v-if="error" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2"/>
+                  <path d="M15 9L9 15" stroke="currentColor" stroke-width="2"/>
+                  <path d="M9 9L15 15" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <svg v-else viewBox="0 0 24 24" fill="none">
+                  <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.709 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999" stroke="currentColor" stroke-width="2"/>
+                  <path d="M22 4L12 14.01L9 11.01" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </div>
+              <span>{{ message }}</span>
             </div>
-
-            <button type="submit" :disabled="loading" class="h-[40px] rounded-md bg-[#007AFF] text-white text-[15px] font-bold">
-              {{ loading ? 'Вход...' : 'Войти' }}
-            </button>
-
-            <div class="w-full h-[0.5px] my-4 bg-[#E5E5E5]"></div>
-
-            <button type="button" @click="handleGoogleSignIn" class="h-[40px] flex items-center justify-center gap-2 rounded-md bg-[#333] text-white text-[12px] font-normal">
-              <img src="/icons/google.svg" alt="google">
-              <p>Войти через Google</p>
-            </button>
-
-            <div class="flex items-center justify-center gap-2">
-              <p class="text-sm">Нет аккаунта?</p>
-              <span class="text-[#007AFF] cursor-pointer text-sm" @click="switchTo('signup')">Зарегистрироваться</span>
-            </div>
-          </form>
-
-          <!-- Форма регистрации -->
-          <form v-else-if="currentMode === 'signup'" @submit.prevent="handleSignup" class="mt-[24px] flex flex-col gap-[16px]">
-            <label>
-              <p class="px-[16px] text-sm mb-[6px]">Имя</p>
-              <input v-model="formData.firstName" class="h-[48px] w-full px-[16px] bg-[#F2F2F2] rounded-md" type="text" placeholder="Иван" required>
-            </label>
-            <label>
-              <p class="px-[16px] text-sm mb-[6px]">Фамилия</p>
-              <input v-model="formData.lastName" class="h-[48px] w-full px-[16px] bg-[#F2F2F2] rounded-md" type="text" placeholder="Иванов" required>
-            </label>
-            <label>
-              <p class="px-[16px] text-sm mb-[6px]">Отчество (при наличии)</p>
-              <input v-model="formData.patronymic" class="h-[48px] w-full px-[16px] bg-[#F2F2F2] rounded-md" type="text" placeholder="Иванович">
-            </label>
-            <label>
-              <p class="px-[16px] text-sm mb-[6px]">Email</p>
-              <input v-model="formData.email" class="h-[48px] w-full px-[16px] bg-[#F2F2F2] rounded-md" type="email" placeholder="example@mail.com" required>
-            </label>
-            <label>
-              <p class="px-[16px] text-sm mb-[6px]">Телефон</p>
-              <input 
-                v-model="formData.phoneNumber" 
-                @input="formatPhoneNumber"
-                @blur="validatePhoneNumber"
-                class="h-[48px] w-full px-[16px] bg-[#F2F2F2] rounded-md" 
-                type="tel" 
-                placeholder="+7 (999) 123-45-67"
-                :class="{ 'border border-red-500': phoneError }"
-              >
-              <p v-if="phoneError" class="text-red-500 text-xs mt-1 px-[16px]">{{ phoneError }}</p>
-            </label>
-            <label>
-              <p class="px-[16px] text-sm mb-[6px]">Пароль</p>
-              <input v-model="formData.password" class="h-[48px] w-full px-[16px] bg-[#F2F2F2] rounded-md" type="password" placeholder="Минимум 6 символов" required>
-            </label>
-            <label>
-              <p class="px-[16px] text-sm mb-[6px]">Подтвердите пароль</p>
-              <input v-model="formData.confirmPassword" class="h-[48px] w-full px-[16px] bg-[#F2F2F2] rounded-md" type="password" required>
-            </label>
-
-            <button 
-              type="submit" 
-              :disabled="loading || phoneError" 
-              class="h-[40px] mt-4 rounded-md bg-[#007AFF] text-white text-[15px] font-bold disabled:bg-gray-400 disabled:cursor-not-allowed"
-            >
-              {{ loading ? 'Регистрация...' : 'Зарегистрироваться' }}
-            </button>
-
-            <div class="flex items-center justify-center gap-2 mt-4">
-              <p class="text-sm">Уже есть аккаунт?</p>
-              <span class="text-[#007AFF] cursor-pointer text-sm" @click="switchTo('login')">Войти</span>
-            </div>
-          </form>
-
-          <!-- Подтверждение email -->
-          <form v-else-if="currentMode === 'verify'" @submit.prevent="handleVerifyEmail" class="mt-[24px] flex flex-col gap-[16px]">
-            <p class="text-sm text-gray-600">Мы отправили 6-значный код на <strong>{{ formData.email }}</strong></p>
-            <label>
-              <p class="px-[16px] text-sm mb-[6px]">Код подтверждения</p>
-              <input v-model="formData.verificationCode" class="h-[48px] w-full px-[16px] bg-[#F2F2F2] rounded-md text-center text-lg tracking-widest" type="text" maxlength="6" placeholder="000000" required>
-            </label>
-            <button type="submit" :disabled="loading" class="h-[40px] rounded-md bg-[#007AFF] text-white text-[15px] font-bold">
-              {{ loading ? 'Проверка...' : 'Подтвердить' }}
-            </button>
-            <p class="text-sm text-center">
-              Не пришло письмо?
-              <span class="text-[#007AFF] cursor-pointer" @click="resendCode">Отправить снова</span>
-            </p>
-          </form>
-
-          <!-- Восстановление пароля -->
-          <form v-else-if="currentMode === 'forgot'" @submit.prevent="handleForgot" class="mt-[24px] flex flex-col gap-[16px]">
-            <label>
-              <p class="px-[16px] text-sm mb-[6px]">Email</p>
-              <input v-model="formData.email" class="h-[48px] w-full px-[16px] bg-[#F2F2F2] rounded-md" type="email" placeholder="Введите email" required>
-            </label>
-            <button type="submit" :disabled="loading" class="h-[40px] rounded-md bg-[#007AFF] text-white text-[15px] font-bold">
-              {{ loading ? 'Отправка...' : 'Отправить код' }}
-            </button>
-            <div class="text-center">
-              <span class="text-[#007AFF] cursor-pointer text-sm" @click="switchTo('login')">Вернуться ко входу</span>
-            </div>
-          </form>
-
-          <!-- Сброс пароля -->
-          <form v-else-if="currentMode === 'reset'" @submit.prevent="handleReset" class="mt-[24px] flex flex-col gap-[16px]">
-            <p class="text-sm text-gray-600">Код отправлен на <strong>{{ formData.email }}</strong></p>
-            <label>
-              <p class="px-[16px] text-sm mb-[6px]">Код сброса</p>
-              <input v-model="formData.resetCode" class="h-[48px] w-full px-[16px] bg-[#F2F2F2] rounded-md text-center text-lg tracking-widest" type="text" maxlength="6" placeholder="000000" required>
-            </label>
-            <label>
-              <p class="px-[16px] text-sm mb-[6px]">Новый пароль</p>
-              <input v-model="formData.password" class="h-[48px] w-full px-[16px] bg-[#F2F2F2] rounded-md" type="password" placeholder="Минимум 6 символов" required>
-            </label>
-            <label>
-              <p class="px-[16px] text-sm mb-[6px]">Подтвердите пароль</p>
-              <input v-model="formData.confirmPassword" class="h-[48px] w-full px-[16px] bg-[#F2F2F2] rounded-md" type="password" required>
-            </label>
-            <button type="submit" :disabled="loading" class="h-[40px] rounded-md bg-[#007AFF] text-white text-[15px] font-bold">
-              {{ loading ? 'Сброс...' : 'Сбросить пароль' }}
-            </button>
-            <div class="text-center">
-              <span class="text-[#007AFF] cursor-pointer text-sm" @click="switchTo('login')">Вернуться ко входу</span>
-            </div>
-          </form>
-        </div>
+          </div>
+        </transition>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
-import axios from 'axios'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-axios.defaults.withCredentials = true
-const router = useRouter()
+import axios from 'axios'
 
-const currentMode = ref('login') 
+const router = useRouter()
+const currentMode = ref('login')
 const rememberMe = ref(false)
 const loading = ref(false)
 const message = ref('')
@@ -211,23 +455,22 @@ const formData = reactive({
 
 const API_URL = 'http://localhost:3000/auth'
 
+onMounted(() => {
+  animateBackground()
+})
+
+const animateBackground = () => {
+  const shapes = document.querySelectorAll('.shape')
+  shapes.forEach((shape, index) => {
+    shape.style.animation = `float ${6 + index * 2}s ease-in-out infinite ${index * 0.5}s`
+  })
+}
 
 const switchTo = (mode) => {
   currentMode.value = mode
   message.value = ''
   error.value = false
-
-  const preservedEmail = formData.email
-
-  Object.keys(formData).forEach(key => {
-    formData[key] = ''
-  })
-
-  if (mode === 'verify' || mode === 'reset') {
-    formData.email = preservedEmail
-  }
 }
-
 
 const setToken = (token) => {
   if (rememberMe.value) {
@@ -238,20 +481,34 @@ const setToken = (token) => {
   axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 }
 
-
 const handleLogin = async () => {
   if (!formData.email || !formData.password) return
   loading.value = true
   message.value = ''
+  
   try {
     const res = await axios.post(`${API_URL}/login`, {
       email: formData.email,
       password: formData.password
     })
+    
     setToken(res.data.token)
+    
+    const userData = {
+      firstName: formData.firstName || 'Пользователь',
+      lastName: formData.lastName || '',
+      avatar: null
+    }
+    
+    if (rememberMe.value) {
+      localStorage.setItem('user', JSON.stringify(userData))
+    } else {
+      sessionStorage.setItem('user', JSON.stringify(userData))
+    }
+    
     message.value = 'Вход успешен!'
     error.value = false
-    setTimeout(() => router.push('/dashboard'), 1000)
+    setTimeout(() => router.push('/profile'), 1000)
   } catch (err) {
     message.value = err.response?.data?.message || 'Ошибка входа'
     error.value = true
@@ -260,7 +517,6 @@ const handleLogin = async () => {
   }
 }
 
-
 const handleSignup = async () => {
   if (formData.password !== formData.confirmPassword) {
     message.value = 'Пароли не совпадают'
@@ -268,15 +524,17 @@ const handleSignup = async () => {
     return
   }
   loading.value = true
+  
   try {
     await axios.post(`${API_URL}/registration`, {
       firstName: formData.firstName,
       lastName: formData.lastName,
-      patronymic: formData.patronymic,
+      patronymic: formData.patronymic || '',
       email: formData.email,
-      phoneNumber: formData.phoneNumber,
+      phoneNumber: formData.phoneNumber || '',
       password: formData.password
     })
+    
     message.value = 'Код отправлен на email!'
     error.value = false
     switchTo('verify')
@@ -287,7 +545,6 @@ const handleSignup = async () => {
     loading.value = false
   }
 }
-
 
 const handleVerifyEmail = async () => {
   loading.value = true
@@ -308,7 +565,6 @@ const handleVerifyEmail = async () => {
   }
 }
 
-
 const resendCode = async () => {
   loading.value = true
   try {
@@ -322,63 +578,6 @@ const resendCode = async () => {
     loading.value = false
   }
 }
-
-const validatePhoneNumber = () => {
-  if (!formData.phoneNumber) {
-    phoneError.value = ''
-    return true
-  }
-
-  // Очищаем номер от всего, кроме цифр
-  const cleanPhone = formData.phoneNumber.replace(/\D/g, '')
-  
-  // Проверяем российские номера (начинаются с 7 или 8, длина 11 цифр)
-  if (cleanPhone.startsWith('7') || cleanPhone.startsWith('8')) {
-    if (cleanPhone.length === 11) {
-      phoneError.value = ''
-      return true
-    } else {
-      phoneError.value = 'Номер должен содержать 11 цифр'
-      return false
-    }
-  }
-  
-  // Для международных номеров - минимальная длина 10 цифр
-  if (cleanPhone.length >= 10 && cleanPhone.length <= 15) {
-    phoneError.value = ''
-    return true
-  } else {
-    phoneError.value = 'Номер должен содержать от 10 до 15 цифр'
-    return false
-  }
-}
-
-// Форматирование номера телефона
-const formatPhoneNumber = () => {
-  if (!formData.phoneNumber) return
-  
-  // Удаляем все нецифровые символы
-  let numbers = formData.phoneNumber.replace(/\D/g, '')
-  
-  // Ограничиваем длину
-  numbers = numbers.substring(0, 11)
-  
-  // Форматируем номер в российском формате
-  let formatted = ''
-  if (numbers.startsWith('7') || numbers.startsWith('8')) {
-    if (numbers.length >= 1) formatted = `+7`
-    if (numbers.length >= 2) formatted += ` (${numbers.substring(1, 4)}`
-    if (numbers.length >= 5) formatted += `) ${numbers.substring(4, 7)}`
-    if (numbers.length >= 8) formatted += `-${numbers.substring(7, 9)}`
-    if (numbers.length >= 10) formatted += `-${numbers.substring(9, 11)}`
-  } else {
-    // Для других форматов просто используем цифры
-    formatted = numbers
-  }
-  
-  formData.phoneNumber = formatted
-}
-
 
 const handleForgot = async () => {
   loading.value = true
@@ -394,7 +593,6 @@ const handleForgot = async () => {
     loading.value = false
   }
 }
-
 
 const handleReset = async () => {
   if (formData.password !== formData.confirmPassword) {
@@ -422,19 +620,477 @@ const handleReset = async () => {
 }
 
 const handleGoogleSignIn = () => {
-  alert('Google Sign-In не настроен')
+  message.value = 'Google Sign-In будет доступен скоро'
+  error.value = false
 }
 </script>
 
 <style scoped>
-.switch { @apply relative inline-block w-9 h-5; }
-.switch-input { @apply opacity-0 w-0 h-0; }
-.switch-slider {
-  @apply absolute cursor-pointer inset-0 bg-gray-300 rounded-full transition;
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  overflow: hidden;
 }
-.switch-slider:before {
-  @apply absolute content-[''] h-4 w-4 left-0.5 bottom-0.5 bg-white rounded-full transition;
+
+.auth-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
-.switch-input:checked + .switch-slider { @apply bg-[#007AFF]; }
-.switch-input:checked + .switch-slider:before { @apply translate-x-4; }
+
+.floating-shapes {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.shape-1 { width: 80px; height: 80px; top: 10%; left: 10%; }
+.shape-2 { width: 120px; height: 120px; top: 60%; right: 10%; }
+.shape-3 { width: 60px; height: 60px; bottom: 20%; left: 20%; }
+.shape-4 { width: 100px; height: 100px; top: 30%; right: 20%; }
+.shape-5 { width: 70px; height: 70px; bottom: 10%; right: 30%; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+
+.glowing-orbs {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.3;
+}
+
+.orb-1 {
+  width: 200px;
+  height: 200px;
+  background: #ff6b6b;
+  top: 10%;
+  left: 5%;
+  animation: pulse 4s ease-in-out infinite;
+}
+
+.orb-2 {
+  width: 300px;
+  height: 300px;
+  background: #4ecdc4;
+  bottom: 10%;
+  right: 5%;
+  animation: pulse 6s ease-in-out infinite 1s;
+}
+
+.orb-3 {
+  width: 150px;
+  height: 150px;
+  background: #45b7d1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse 5s ease-in-out infinite 2s;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.1); opacity: 0.5; }
+}
+
+.auth-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 40px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  z-index: 10;
+}
+
+.card-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.mode-tabs {
+  display: flex;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #667eea;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+  background: white;
+  color: #667eea;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+}
+
+.form-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.form-subtitle {
+  color: #718096;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.name-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.input-group {
+  position: relative;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.form-input {
+  width: 100%;
+  padding: 16px 48px 16px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 16px;
+  background: white;
+  transition: all 0.3s ease;
+}
+
+.form-input.text-center {
+  text-align: center;
+  letter-spacing: 8px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-input:focus + .input-label,
+.form-input:not(:placeholder-shown) + .input-label {
+  transform: translateY(-24px) scale(0.875);
+  color: #667eea;
+}
+
+.input-label {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  color: #a0aec0;
+  font-size: 16px;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  background: white;
+  padding: 0 4px;
+}
+
+.input-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #cbd5e0;
+  width: 20px;
+  height: 20px;
+}
+
+.form-input:focus ~ .input-icon {
+  color: #667eea;
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #4a5568;
+}
+
+.checkbox-input {
+  display: none;
+}
+
+.checkmark {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #cbd5e0;
+  border-radius: 4px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.checkbox-input:checked + .checkmark {
+  background: #667eea;
+  border-color: #667eea;
+}
+
+.checkbox-input:checked + .checkmark::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 6px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.text-link {
+  background: none;
+  border: none;
+  color: #667eea;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.text-link:hover {
+  color: #5a67d8;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #a0aec0;
+  font-size: 14px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.divider::before {
+  margin-right: 16px;
+}
+
+.divider::after {
+  margin-left: 16px;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.social-btn:hover {
+  border-color: #667eea;
+  transform: translateY(-1px);
+}
+
+.social-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.google-btn {
+  color: #4a5568;
+}
+
+.form-footer {
+  text-align: center;
+  color: #718096;
+  font-size: 14px;
+}
+
+.form-footer p {
+  margin: 0;
+}
+
+.form-slide-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.form-slide-leave-active {
+  transition: all 0.2s ease-in;
+}
+
+.form-slide-enter-from {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.form-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.notification-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.notification-leave-active {
+  transition: all 0.2s ease-in;
+}
+
+.notification-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.notification-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  font-weight: 500;
+  z-index: 1000;
+  max-width: 320px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.notification.success {
+  background: #48bb78;
+  color: white;
+}
+
+.notification.error {
+  background: #f56565;
+  color: white;
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notification-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    margin: 20px;
+    padding: 24px;
+  }
+  
+  .name-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>

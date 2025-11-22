@@ -1,12 +1,21 @@
 <template>
-  <Header></Header>
+  <Header v-if="!isAuthPage"></Header>
   <router-view />
-  <Footer></Footer>
+  <Footer v-if="!isAuthPage"></Footer>
 </template>
 
 <script setup>
 import Header from './components/Header.vue';
 import Footer from './components/Footer.vue';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+
+const isAuthPage = computed(() => {
+  return route.name === 'Auth' || route.path === '/auth';
+});
+
 import axios from 'axios';
 const token = localStorage.getItem('token') || sessionStorage.getItem('token')
 if (token) {

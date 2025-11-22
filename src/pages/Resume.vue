@@ -5,11 +5,7 @@
       <nav class="sidebar-nav">
         <ul class="nav-list">
           <li v-for="(item, index) in menuItems" :key="index" class="nav-item">
-            <a 
-              :href="`#${item.id}`" 
-              class="nav-link" 
-              :class="{ active: activeMenuItem === index }"
-            >
+            <a :href="`#${item.id}`" class="nav-link" :class="{ active: activeMenuItem === index }">
               {{ item.title }}
             </a>
           </li>
@@ -22,7 +18,9 @@
       <div class="header-card" id="general">
         <div class="profile-section">
           <div class="photo-container">
-            <img :src="`http://localhost:3000/uploads/avatars/${resume.user.avatar}` || 'https://via.placeholder.com/120'" alt="Фото" class="profile-photo" />
+            <img
+              :src="resume.user.avatar ? `http://localhost:3000/uploads/avatars/${resume.user.avatar}` : '/images/placeholders/avatar.png'"
+              alt="Фото" class="profile-photo" />
             <button @click="openModal('photo')" class="edit-photo-btn" title="Изменить фото">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
@@ -45,7 +43,7 @@
               </button>
             </div>
             <div class="position-section">
-              <p class="position">{{ resume.title }}</p>
+              <p class="position">{{ resume?.title }}</p>
               <button @click="openModal('position')" class="btn-icon edit-btn" title="Редактировать должность">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor"
@@ -81,11 +79,11 @@
               </div>
             </div>
             <div class="contacts-info" v-if="hasContacts">
-              <a v-if="resume.contacts.email" :href="`mailto:${resume.contacts.email}`" class="contact-link">
-                {{ resume.contacts.email }}
+              <a v-if="resume.user.email" :href="`mailto:${resume.user.email}`" class="contact-link">
+                {{ resume.user.email }}
               </a>
-              <a v-if="resume.contacts.phone" :href="`tel:${resume.contacts.phone}`" class="contact-link">
-                {{ resume.contacts.phone }}
+              <a v-if="resume.user.phoneNumber" :href="`tel:${resume.user.phoneNumber}`" class="contact-link">
+                {{ resume.user.phoneNumber }}
               </a>
               <a v-if="resume.contacts.telegram" :href="resume.contacts.telegram" target="_blank" class="contact-link">
                 Telegram
@@ -366,8 +364,8 @@
 
           <div class="modal-footer">
             <button @click="closeModal" class="btn btn-secondary">Отмена</button>
-            <button @click="saveItem" class="btn btn-primary" :disabled="!isFormValid">
-              {{ isEditing ? 'Сохранить' : 'Добавить' }}
+            <button @click="saveItem" class="btn btn-primary" :disabled="!isFormValid || isLoading">
+              {{ isLoading ? 'Сохранение...' : (isEditing ? 'Сохранить' : 'Добавить') }}
             </button>
           </div>
         </div>
@@ -392,8 +390,8 @@
     </div>
 
     <div class="loader-container" v-else>
-        <span class="loader"></span>
-      </div>
+      <span class="loader"></span>
+    </div>
   </div>
 
 </template>
@@ -427,7 +425,7 @@ async function loadResume() {
     const res = await axios.get(`http://localhost:3000/resume/${id.value}`)
     resume.value = res.data.resume
     console.log(res.data.resume);
-    
+
   } catch (error) {
     console.error(error);
   }
@@ -524,7 +522,7 @@ const isFormValid = computed(() => {
     case 'age':
       return modalData.value.trim().length > 0;
     case 'description':
-      return modalData.description.trim().length > 0;
+      return modalData.description?.trim().length > 0;
     case 'contacts':
       return modalData.email.trim().length > 0 ||
         modalData.phone.trim().length > 0 ||
@@ -571,16 +569,21 @@ const openModal = (type, index = -1) => {
         modalData.value = fullName.value;
         break;
       case 'position':
-        modalData.value = resume.title;
+        modalData.value = resume.value?.title || '';
         break;
       case 'age':
-        modalData.value = resume.user.age.toString();
+        modalData.value = resume.value.user.age.toString();
         break;
       case 'description':
-        modalData.description = resume.description;
+        modalData.description = resume.value.description;
         break;
       case 'contacts':
-        Object.assign(modalData, resume.contacts);
+        const contactsData = {
+          ...resume.value.contacts,
+          email: resume.value.user.email,
+          phone: resume.value.user.phoneNumber
+        };
+        Object.assign(modalData, contactsData);
         break;
     }
   }
@@ -596,80 +599,113 @@ const closeModal = () => {
     editingIndex.value = -1;
   }, 300);
 };
+// В секцию script setup, после loadResume()
+const isLoading = ref(false);
 
-const saveItem = () => {
+async function updateResume() {
+  isLoading.value = true;
+  try {
+    const updateData = resume.value;
+
+    await axios.put(`http://localhost:3000/resume/${id.value}`, updateData, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    console.log('Резюме обновлено');
+  } catch (error) {
+    console.error('Ошибка при обновлении резюме:', error);
+    alert('Ошибка при сохранении изменений');
+  } finally {
+    isLoading.value = false;
+  }
+}
+const saveItem = async () => {
   if (!isFormValid.value) return;
 
-  switch (modalType.value) {
-    case 'name':
-      const [firstName, ...lastNameParts] = modalData.value.trim().split(' ');
-      resume.user.firstName = firstName;
-      resume.user.lastName = lastNameParts.join(' ');
-      break;
-    case 'position':
-      resume.title = modalData.value.trim();
-      break;
-    case 'age':
-      resume.user.age = parseInt(modalData.value.trim());
-      break;
-    case 'description':
-      resume.description = modalData.description.trim();
-      break;
-    case 'contacts':
-      Object.assign(resume.contacts, {
-        email: modalData.email.trim(),
-        phone: modalData.phone.trim(),
-        telegram: modalData.telegram.trim(),
-        github: modalData.github.trim()
-      });
-      break;
-    case 'workExperience':
-      const workExp = {
-        title: modalData.title.trim(),
-        company: modalData.company.trim(),
-        period: modalData.period.trim(),
-        achievements: modalData.achievements.trim()
-      };
-      if (isEditing.value) {
-        resume.workExperience[editingIndex.value] = workExp;
-      } else {
-        resume.workExperience.push(workExp);
-      }
-      break;
-    case 'education':
-      const edu = {
-        degree: modalData.degree.trim(),
-        field: modalData.field.trim(),
-        institution: modalData.institution.trim(),
-        year: parseInt(modalData.year)
-      };
-      if (isEditing.value) {
-        resume.education[editingIndex.value] = edu;
-      } else {
-        resume.education.push(edu);
-      }
-      break;
-    case 'skill':
-      if (isEditing.value) {
-        resume.skills[editingIndex.value] = modalData.name.trim();
-      } else {
-        resume.skills.push(modalData.name.trim());
-      }
-      break;
-    case 'language':
-      const lang = {
-        language: modalData.language.trim(),
-        level: modalData.level
-      };
-      if (isEditing.value) {
-        resume.languages[editingIndex.value] = lang;
-      } else {
-        resume.languages.push(lang);
-      }
-      break;
-  }
+  try {
+    switch (modalType.value) {
+      case 'name':
+        const [firstName, ...lastNameParts] = modalData.value.trim().split(' ');
+        resume.value.user.firstName = firstName;
+        resume.value.user.lastName = lastNameParts.join(' ');
+        break;
+      case 'position':
+        resume.value.title = modalData.value.trim();
+        break;
+      case 'age':
+        resume.value.user.age = parseInt(modalData.value.trim());
+        break;
+      case 'description':
+        resume.value.description = modalData.description.trim();
+        break;
+      case 'contacts':
+        Object.assign(resume.value.contacts, {
+          email: modalData.email.trim(),
+          phone: modalData.phone.trim(),
+          telegram: modalData.telegram.trim(),
+          github: modalData.github.trim()
+        });
 
-  closeModal();
+        if (resume.value.user) {
+          resume.value.user.email = modalData.email.trim();
+          resume.value.user.phoneNumber = modalData.phone.trim();
+        }
+        break;
+      case 'workExperience':
+        const workExp = {
+          title: modalData.title.trim(),
+          company: modalData.company.trim(),
+          period: modalData.period.trim(),
+          achievements: modalData.achievements.trim()
+        };
+        if (isEditing.value) {
+          resume.value.workExperience[editingIndex.value] = workExp;
+        } else {
+          resume.value.workExperience.push(workExp);
+        }
+        break;
+      case 'education':
+        const edu = {
+          degree: modalData.degree.trim(),
+          field: modalData.field.trim(),
+          institution: modalData.institution.trim(),
+          year: parseInt(modalData.year)
+        };
+        if (isEditing.value) {
+          resume.value.education[editingIndex.value] = edu;
+        } else {
+          resume.value.education.push(edu);
+        }
+        break;
+      case 'skill':
+        if (isEditing.value) {
+          resume.value.skills[editingIndex.value] = modalData.name.trim();
+        } else {
+          resume.value.skills.push(modalData.name.trim());
+        }
+        break;
+      case 'language':
+        const lang = {
+          language: modalData.language.trim(),
+          level: modalData.level
+        };
+        if (isEditing.value) {
+          resume.value.languages[editingIndex.value] = lang;
+        } else {
+          resume.value.languages.push(lang);
+        }
+        break;
+    }
+
+    // Сохраняем изменения на сервере
+    await updateResume();
+    closeModal();
+
+  } catch (error) {
+    console.error('Ошибка при сохранении:', error);
+  }
 };
 
 //////////////////////////////////////////////////////////////// Методы для удаления
@@ -698,31 +734,38 @@ const closeDeleteConfirm = () => {
   }, 300);
 };
 
-const confirmDelete = () => {
-  switch (deleteType.value) {
-    case 'skill':
-      resume.skills.splice(deleteIndex.value, 1);
-      break;
-    case 'workExperience':
-      resume.workExperience.splice(deleteIndex.value, 1);
-      break;
-    case 'education':
-      resume.education.splice(deleteIndex.value, 1);
-      break;
-    case 'language':
-      resume.languages.splice(deleteIndex.value, 1);
-      break;
-  }
-  closeDeleteConfirm();
-};
+const confirmDelete = async () => {
+  try {
+    switch (deleteType.value) {
+      case 'skill':
+        resume.value.skills.splice(deleteIndex.value, 1);
+        break;
+      case 'workExperience':
+        resume.value.workExperience.splice(deleteIndex.value, 1);
+        break;
+      case 'education':
+        resume.value.education.splice(deleteIndex.value, 1);
+        break;
+      case 'language':
+        resume.value.languages.splice(deleteIndex.value, 1);
+        break;
+    }
 
+    // Сохраняем изменения на сервере
+    await updateResume();
+    closeDeleteConfirm();
+
+  } catch (error) {
+    console.error('Ошибка при удалении:', error);
+  }
+};
 //////////////////////////////////////////////////////////////// Вспомогательные методы
 const getItemByType = (type, index) => {
   switch (type) {
-    case 'skill': return resume.skills[index];
-    case 'workExperience': return resume.workExperience[index];
-    case 'education': return resume.education[index];
-    case 'language': return resume.languages[index];
+    case 'skill': return resume.value.skills[index];
+    case 'workExperience': return resume.value.workExperience[index];
+    case 'education': return resume.value.education[index];
+    case 'language': return resume.value.languages[index];
     default: return null;
   }
 };
@@ -813,7 +856,7 @@ const editItem = (type, index) => {
   display: flex;
   flex-direction: column;
   margin-inline: auto;
-  
+
   gap: 32px;
   color: #333;
 }
