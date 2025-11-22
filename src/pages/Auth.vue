@@ -173,6 +173,25 @@
               <div class="input-group">
                 <div class="input-wrapper">
                   <input 
+                    v-model="formData.patronymic" 
+                    type="text" 
+                    placeholder=" "
+                    class="form-input"
+                    required
+                  >
+                  <label class="input-label">Отчество</label>
+                  <div class="input-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M20 21V19C20 16.7909 18.2091 15 16 15H8C5.79086 15 4 16.7909 4 19V21" stroke="currentColor" stroke-width="2"/>
+                      <path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="input-group">
+                <div class="input-wrapper">
+                  <input 
                     v-model="formData.email" 
                     type="email" 
                     placeholder=" "
@@ -184,6 +203,23 @@
                     <svg viewBox="0 0 24 24" fill="none">
                       <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2"/>
                       <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="input-group">
+                <div class="input-wrapper">
+                  <input 
+                    v-model="formData.phoneNumber" 
+                    type="tel" 
+                    placeholder=" "
+                    class="form-input"
+                  >
+                  <label class="input-label">Телефон (необязательно)</label>
+                  <div class="input-icon">
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" stroke="currentColor" stroke-width="2"/>
                     </svg>
                   </div>
                 </div>
@@ -473,12 +509,14 @@ const switchTo = (mode) => {
 }
 
 const setToken = (token) => {
-  if (rememberMe.value) {
-    localStorage.setItem('token', token)
-  } else {
-    sessionStorage.setItem('token', token)
+  if (token) {
+    if (rememberMe.value) {
+      localStorage.setItem('token', token)
+    } else {
+      sessionStorage.setItem('token', token)
+    }
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
   }
-  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 }
 
 const handleLogin = async () => {
@@ -492,23 +530,15 @@ const handleLogin = async () => {
       password: formData.password
     })
     
-    setToken(res.data.token)
-    
-    const userData = {
-      firstName: formData.firstName || 'Пользователь',
-      lastName: formData.lastName || '',
-      avatar: null
-    }
-    
-    if (rememberMe.value) {
-      localStorage.setItem('user', JSON.stringify(userData))
+    if (res.data.token) {
+      setToken(res.data.token)
+      message.value = 'Вход успешен!'
+      error.value = false
+      setTimeout(() => router.push('/profile'), 1000)
     } else {
-      sessionStorage.setItem('user', JSON.stringify(userData))
+      message.value = 'Токен не получен от сервера'
+      error.value = true
     }
-    
-    message.value = 'Вход успешен!'
-    error.value = false
-    setTimeout(() => router.push('/profile'), 1000)
   } catch (err) {
     message.value = err.response?.data?.message || 'Ошибка входа'
     error.value = true
@@ -526,10 +556,10 @@ const handleSignup = async () => {
   loading.value = true
   
   try {
-    await axios.post(`${API_URL}/registration`, {
+    const res = await axios.post(`${API_URL}/registration`, {
       firstName: formData.firstName,
       lastName: formData.lastName,
-      patronymic: formData.patronymic || '',
+      patronymic: formData.patronymic,
       email: formData.email,
       phoneNumber: formData.phoneNumber || '',
       password: formData.password
@@ -539,7 +569,12 @@ const handleSignup = async () => {
     error.value = false
     switchTo('verify')
   } catch (err) {
-    message.value = err.response?.data?.message || 'Ошибка регистрации'
+    if (err.response?.data?.errors) {
+      const errors = err.response.data.errors
+      message.value = errors.map(e => e.msg).join(', ')
+    } else {
+      message.value = err.response?.data?.message || 'Ошибка регистрации'
+    }
     error.value = true
   } finally {
     loading.value = false
@@ -553,10 +588,16 @@ const handleVerifyEmail = async () => {
       email: formData.email,
       code: formData.verificationCode
     })
-    setToken(res.data.token)
-    message.value = 'Email подтверждён!'
-    error.value = false
-    setTimeout(() => router.push('/dashboard'), 1000)
+    
+    if (res.data.token) {
+      setToken(res.data.token)
+      message.value = 'Email подтверждён!'
+      error.value = false
+      setTimeout(() => router.push('/dashboard'), 1000)
+    } else {
+      message.value = 'Токен не получен после подтверждения'
+      error.value = true
+    }
   } catch (err) {
     message.value = err.response?.data?.message || 'Неверный код'
     error.value = true
@@ -607,10 +648,16 @@ const handleReset = async () => {
       resetCode: formData.resetCode,
       newPassword: formData.password
     })
-    setToken(res.data.token)
-    message.value = 'Пароль сброшен!'
-    error.value = false
-    setTimeout(() => router.push('/dashboard'), 1000)
+    
+    if (res.data.token) {
+      setToken(res.data.token)
+      message.value = 'Пароль сброшен!'
+      error.value = false
+      setTimeout(() => router.push('/dashboard'), 1000)
+    } else {
+      message.value = 'Токен не получен после сброса пароля'
+      error.value = true
+    }
   } catch (err) {
     message.value = err.response?.data?.message || 'Ошибка сброса'
     error.value = true
@@ -624,7 +671,6 @@ const handleGoogleSignIn = () => {
   error.value = false
 }
 </script>
-
 <style scoped>
 .auth-container {
   min-height: 100vh;

@@ -62,9 +62,7 @@ const fetchUserProfile = async () => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token')
     if (!token) return null
     
-    const res = await axios.get(`${API_URL}/profile`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+    const res = await axios.get(`${API_URL}/profile`)
     
     const userData = {
       firstName: res.data.students?.firstName || 'Пользователь',
@@ -84,7 +82,7 @@ const checkAuth = async () => {
   const token = localStorage.getItem('token') || sessionStorage.getItem('token')
   const userData = localStorage.getItem('user')
   
-  if (token) {
+  if (token && token !== 'undefined' && token !== 'null') {
     if (userData) {
       user.value = JSON.parse(userData)
       isAuthenticated.value = true
