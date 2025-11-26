@@ -1,7 +1,7 @@
 <template>
-  <Header v-if="!isAuthPage"></Header>
+  <Header v-if="!isAuthPage && !isNotFoundPage"></Header>
   <router-view />
-  <Footer v-if="!isAuthPage"></Footer>
+  <Footer v-if="!isAuthPage && !isNotFoundPage"></Footer>
 </template>
 
 <script setup>
@@ -15,6 +15,11 @@ const route = useRoute();
 const isAuthPage = computed(() => {
   return route.name === 'Auth' || route.path === '/auth';
 });
+
+const isNotFoundPage = computed(() => {
+  return route.name === 'NotFound' || route.matched.some(record => record.path === '/:pathMatch(.*)*');
+});
+
 
 import axios from 'axios';
 const token = localStorage.getItem('token') || sessionStorage.getItem('token')
