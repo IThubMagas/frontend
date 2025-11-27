@@ -115,28 +115,24 @@ const handleLogout = () => {
 .header {
   background: #fff;
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.9);
 }
 
 .header__container {
   max-width: 1260px;
-  margin: 0 auto;
+  margin-inline: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 70px;
-  padding: 0 20px;
 }
 
 .header__logo {
   font-family: "Unbounded", sans-serif;
   font-size: 28px;
   font-weight: 700;
-  background: linear-gradient(135deg, #5E61FF, #8B5CF6);
+  background-color: #5E61FF;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -203,24 +199,15 @@ const handleLogout = () => {
   gap: 12px;
   padding: 8px 16px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(229, 231, 235, 0.8);
   text-decoration: none;
   transition: all 0.2s ease;
 }
 
-.user-profile-link:hover {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(94, 97, 255, 0.2);
-}
-
 .user-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  overflow: hidden;
-  flex-shrink: 0;
-  background: linear-gradient(135deg, #5E61FF, #8B5CF6);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: #5E61FF;
 }
 
 .avatar-img {
