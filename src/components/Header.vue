@@ -46,7 +46,7 @@ const user = ref({
   avatar: null
 })
 
-const API_URL = 'http://localhost:3000/auth'
+const API_URL = 'http://localhost:3000'
 
 const userInitials = computed(() => {
   const { firstName, lastName } = user.value
@@ -62,7 +62,7 @@ const fetchUserProfile = async () => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token')
     if (!token) return null
     
-    const res = await axios.get(`${API_URL}/profile`)
+    const res = await axios.get(`${API_URL}/users/profile/me`)
     
     const userData = {
       firstName: res.data.students?.firstName || 'Пользователь',

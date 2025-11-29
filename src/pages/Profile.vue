@@ -1,8 +1,3 @@
-
-
-
-
-
 <template>
     <div class="flex justify-center">
         <div class="mainProfile w-fit flex mt-[40px] gap-[93px]">
@@ -314,24 +309,114 @@
             </div>
 
             <!-- Проекты -->
-            <div class="mt-[60px]">
-                <p class="font-semibold text-[20px]">Проекты</p>
+            <!-- Проекты -->
+<div class="mt-[60px]" id="projects">
+  <div class="flex justify-between items-center mb-4">
+    <p class="font-semibold text-[20px]">Проекты</p>
+    <button @click="openModal('project')" class="btn btn-add">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      Добавить проект
+    </button>
+  </div>
+  
+  <div class="projects-list">
+    <div v-for="(project, index) in projects" :key="index" class="project-card projects-block">
+      <div class="project-header">
+        <h3 class="project-title">
+          <a :href="project.link" target="_blank" class="text-[#5E61FF] hover:underline">
+            {{ project.link }}
+          </a>
+        </h3>
+        <div class="project-actions">
+          <button @click="editItem('project', index)" class="btn-icon edit-btn" title="Редактировать">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </button>
+          <button @click="deleteItem('project', index)" class="btn-icon delete-btn" title="Удалить">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <p class="project-description">{{ project.description }}</p>
+    </div>
+  </div>
+</div>
 
-                <div class="max-h-[76px]">
-                    <p class="font-semibold mt-4">Ссылка</p>
-                    <input v-model="UserData.linkProject" class="min-w-full max-h-12 mt-2 p-3 rounded-lg border" type="text" placeholder="Введите ссылку">
-                </div>
+<!-- Достижения -->
+<div class="mt-[60px]" id="achievements">
+  <div class="flex justify-between items-center mb-4">
+    <p class="font-semibold text-[20px]">Достижения</p>
+    <button @click="openModal('achievement')" class="btn btn-add">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      Добавить достижение
+    </button>
+  </div>
+  
+  <div class="project-card">
+    <div class="achievements-list">
+      <div v-for="(achievement, index) in achievements" :key="index" class="achievement-item">
+        <span class="achievement-link">{{ achievement.text }}</span>
+        <div class="achievement-actions">
+          <button @click="editItem('achievement', index)" class="btn-icon edit-btn" title="Редактировать">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </button>
+          <button @click="deleteItem('achievement', index)" class="btn-icon delete-btn" title="Удалить">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-                <div>
-                    <p class="font-semibold mt-4">Описание</p>
-                    <textarea 
-                        name="descript-project" 
-                        class="w-full h-[123px] min-h-[100px] max-h-[300px] p-3 mt-3 rounded-lg border resize-y"
-                        v-model="UserData.description" 
-                        placeholder="Введите описание"
-                    ></textarea>
-                </div>
-            </div>
+<!-- Соцсети -->
+<div class="mt-[60px]" id="social">
+  <div class="flex justify-between items-center mb-4">
+    <p class="font-semibold text-[20px]">Соцсети</p>
+    <button @click="openModal('social')" class="btn btn-add">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      Добавить соцсеть
+    </button>
+  </div>
+  
+  <div class="project-card">
+    <div class="achievements-list">
+      <div v-for="(social, index) in socials" :key="index" class="achievement-item">
+        <a :href="social.link" target="_blank" class="achievement-link">
+          {{ social.social }} - {{ social.link }}
+        </a>
+        <div class="achievement-actions">
+          <button @click="editItem('social', index)" class="btn-icon edit-btn" title="Редактировать">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </button>
+          <button @click="deleteItem('social', index)" class="btn-icon delete-btn" title="Удалить">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
             <!-- Ссылки на соцсети -->
             <div class="mt-[60px]">
@@ -423,6 +508,30 @@
                     <textarea v-model="modalData.description" class="form-textarea"
                         placeholder="Расскажите о себе..."></textarea>
                 </div>
+
+                <!-- Проекты -->
+<div v-else-if="modalType === 'project'" class="form-group">
+  <label class="form-label">Ссылка на проект</label>
+  <input v-model="modalData.link" type="url" class="form-input" placeholder="https://example.com/project"/>
+  <label class="form-label">Описание проекта</label>
+  <textarea v-model="modalData.description" class="form-textarea"
+      placeholder="Опишите ваш проект..."></textarea>
+</div>
+
+<!-- Соцсети -->
+<div v-else-if="modalType === 'social'" class="form-group">
+  <label class="form-label">Название соцсети</label>
+  <input v-model="modalData.social" type="text" class="form-input" placeholder="Например: LinkedIn"/>
+  <label class="form-label">Ссылка</label>
+  <input v-model="modalData.socialLink" type="url" class="form-input" placeholder="https://example.com/profile"/>
+</div>
+
+<!-- Достижения -->
+<div v-else-if="modalType === 'achievement'" class="form-group">
+  <label class="form-label">Текст достижения</label>
+  <textarea v-model="modalData.achievementText" class="form-textarea"
+      placeholder="Опишите ваше достижение..."></textarea>
+</div>
 
                 <!-- Контакты -->
                 <div v-else-if="modalType === 'contacts'" class="form-group">
@@ -516,7 +625,6 @@
 import { onMounted, ref, computed, reactive } from 'vue';
 import axios from 'axios';
 
-
 const activeMenuItem = ref(0);
 const menuItems = [
   { title: 'Общее', id: "general" },  
@@ -532,29 +640,30 @@ const menuItems = [
   { title: 'Уведомления', id: "notifications" },
 ];
 
-const setActiveMenuItem = (index) => {
-    activeMenuItem.value = index;
-};
-
 const UserData = ref({});
 const originalUserData = ref({});
+const isLoading = ref(false);
 
+// Computed properties для удобства
 const workExperience = computed(() => UserData.value.workExperience || []);
 const education = computed(() => UserData.value.education || []);
 const skills = computed(() => UserData.value.skills || []);
 const languages = computed(() => UserData.value.languages || []);
+const projects = computed(() => UserData.value.projects || []);
+const socials = computed(() => UserData.value.socials || []);
+const achievements = computed(() => UserData.value.achievements || []);
+
 const hasContacts = computed(() => 
     UserData.value.email || 
     UserData.value.phoneNumber || 
-    UserData.value.telegram || 
-    UserData.value.github
+    (UserData.value.contacts && (UserData.value.contacts.telegram || UserData.value.contacts.github))
 );
 
+// Модальные окна состояния
 const showModal = ref(false);
 const modalType = ref('');
 const isEditing = ref(false);
 const editingIndex = ref(-1);
-const isLoading = ref(false);
 
 const modalData = reactive({
     value: '',
@@ -573,153 +682,192 @@ const modalData = reactive({
     year: '',
     name: '',
     language: '',
-    level: 'Beginner'
+    level: 'Beginner',
+    link: '',
+    social: '',
+    socialLink: '',
+    achievementText: ''
 });
 
+// Удаление состояния
 const showDeleteConfirm = ref(false);
 const deleteType = ref('');
 const deleteIndex = ref(-1);
 const deletePreview = ref('');
 
-const selected = ref('A');
-const options = ref([
-  { text: 'Ищу работу', value: 'A' },
-  { text: 'Работаю', value: 'B' },
-  { text: 'Учусь', value: 'C' }
+// Опции для селектов
+const selected = ref('Not looking');
+const statusOptions = ref([
+  { text: 'Не ищу работу', value: 'Not looking' },
+  { text: 'Открыт к предложениям', value: 'Open to offers' },
+  { text: 'Активно ищу работу', value: 'Actively searching' }
 ]);
 
-const educations = ref([
-  { text: 'Среднее', value: 'Среднее' },
-  { text: 'Среднее специальное', value: 'Среднее специальное' },
-  { text: 'Высшее', value: 'Высшее' }
+const industryOptions = ref([
+  { text: 'Веб-разработка', value: 'Web Development' },
+  { text: 'Программирование', value: 'Programming' },
+  { text: 'Цифровой дизайн', value: 'Digital Design' },
+  { text: 'Разработка игр', value: 'Game Development' },
+  { text: 'Информационная безопасность', value: 'Information Security' },
+  { text: 'Цифровой маркетинг', value: 'Digital Marketing' }
 ]);
 
-const fieldLabels = {
-    name: 'Имя и фамилия',
-    age: 'Возраст',
-    description: 'О себе'
+const workFormatOptions = ref([
+  { text: 'В офисе', value: 'On-site' },
+  { text: 'Удаленно', value: 'Remote' },
+  { text: 'Гибридный', value: 'Hybrid' }
+]);
+
+const employmentTypeOptions = ref([
+  { text: 'Стажер', value: 'Intern' },
+  { text: 'Волонтер', value: 'Volunteer' },
+  { text: 'Полная занятость', value: 'Full-time' },
+  { text: 'Частичная занятость', value: 'Part-time' }
+]);
+
+// Методы для работы с API
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("token");
+  return { 
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  };
 };
 
-const fieldPlaceholders = {
-    name: 'Введите имя и фамилию',
-    age: 'Например: 20 лет',
-    description: 'Расскажите о себе...'
-};
+// Загрузка профиля
+async function loadUserProfile() {
+  isLoading.value = true;
+  try {
+    const response = await axios.get("http://localhost:3000/users/profile/me", {
+      headers: getAuthHeaders()
+    });
+    
+    UserData.value = response.data.user || {};
+    originalUserData.value = JSON.parse(JSON.stringify(UserData.value));
+    
+    // Инициализация массивов если они undefined
+    if (!UserData.value.workExperience) UserData.value.workExperience = [];
+    if (!UserData.value.education) UserData.value.education = [];
+    if (!UserData.value.skills) UserData.value.skills = [];
+    if (!UserData.value.languages) UserData.value.languages = [];
+    if (!UserData.value.projects) UserData.value.projects = [];
+    if (!UserData.value.socials) UserData.value.socials = [];
+    if (!UserData.value.achievements) UserData.value.achievements = [];
+    if (!UserData.value.contacts) UserData.value.contacts = {};
+    
+  } catch (error) {
+    console.error('Ошибка при загрузке профиля:', error);
+    alert('Не удалось загрузить профиль');
+  } finally {
+    isLoading.value = false;
+  }
+}
 
-const modalTitle = computed(() => {
-    const types = {
-        name: 'Имя',
-        age: 'Возраст',
-        description: 'О себе',
-        contacts: 'Контакты',
-        education: 'Образование',
-        workExperience: 'Опыт работы',
-        skill: 'Навык',
-        language: 'Язык'
-    };
-    const action = isEditing.value ? 'Редактирование' : 'Добавление';
-    return isEditing.value ? `Редактирование ${types[modalType.value]}` : `Добавление ${types[modalType.value]}`;
-});
-
-const isFormValid = computed(() => {
-    switch (modalType.value) {
-        case 'name':
-        case 'age':
-            return modalData.value.trim().length > 0;
-        case 'description':
-            return modalData.description?.trim().length > 0;
-        case 'contacts':
-            return modalData.email.trim().length > 0 ||
-                modalData.phone.trim().length > 0 ||
-                modalData.telegram.trim().length > 0 ||
-                modalData.github.trim().length > 0;
-        case 'workExperience':
-            return modalData.title.trim().length > 0 &&
-                modalData.company.trim().length > 0 &&
-                modalData.period.trim().length > 0;
-        case 'education':
-            return modalData.degree.trim().length > 0 &&
-                modalData.field.trim().length > 0 &&
-                modalData.institution.trim().length > 0 &&
-                modalData.year > 0;
-        case 'skill':
-            return modalData.name.trim().length > 0;
-        case 'language':
-            return modalData.language.trim().length > 0 &&
-                modalData.level.trim().length > 0;
-        default:
-            return false;
-    }
-});
-
+// Обновление профиля
 async function updateUser() {
-    isLoading.value = true;
-    const BEARER_TOKEN = localStorage.getItem("token");
-    try {
-        const res = await axios.put("http://localhost:3000/auth/profile", 
-            { userData: UserData.value },
-            { headers: { 'Authorization': `Bearer ${BEARER_TOKEN}` } }
-        );
-        console.log('Профиль обновлен:', res);
-        originalUserData.value = { ...UserData.value };
-    } catch (error) {
-        console.error('Ошибка при обновлении профиля:', error);
-        alert('Ошибка при сохранении изменений');
-    } finally {
-        isLoading.value = false;
-    }
-}
+  isLoading.value = true;
+  try {
+    // Подготовка данных для отправки
+    const updateData = {
+      firstName: UserData.value.firstName,
+      lastName: UserData.value.lastName,
+      patronymic: UserData.value.patronymic,
+      email: UserData.value.email,
+      phoneNumber: UserData.value.phoneNumber,
+      age: UserData.value.age,
+      city: UserData.value.city,
+      about: UserData.value.about,
+      status: UserData.value.status,
+      industry: UserData.value.industry,
+      workFormat: UserData.value.workFormat,
+      employmentType: UserData.value.employmentType,
+      workExperience: UserData.value.workExperience,
+      education: UserData.value.education,
+      skills: UserData.value.skills,
+      languages: UserData.value.languages,
+      projects: UserData.value.projects,
+      socials: UserData.value.socials,
+      achievements: UserData.value.achievements,
+      contacts: UserData.value.contacts
+    };
 
-async function resetProfile() {
-    UserData.value = { ...originalUserData.value };
-}
-
-const openModal = (type, index = -1) => {
-    modalType.value = type;
-    isEditing.value = index !== -1;
-    editingIndex.value = index;
-
-    Object.keys(modalData).forEach(key => modalData[key] = '');
-
-    if (isEditing.value) {
-        const item = getItemByType(type, index);
-        if (item) {
-            Object.assign(modalData, item);
-        }
+    const response = await axios.put(
+      "http://localhost:3000/users/profile/me", 
+      updateData,
+      { headers: getAuthHeaders() }
+    );
+    
+    console.log('Профиль обновлен:', response.data);
+    originalUserData.value = JSON.parse(JSON.stringify(UserData.value));
+    alert('Профиль успешно обновлен!');
+    
+  } catch (error) {
+    console.error('Ошибка при обновлении профиля:', error);
+    if (error.response?.data?.message) {
+      alert(`Ошибка: ${error.response.data.message}`);
     } else {
-        switch (type) {
-            case 'name':
-                modalData.value = `${UserData.value.firstName} ${UserData.value.lastName}`;
-                break;
-            case 'age':
-                modalData.value = UserData.value.age?.toString() || '';
-                break;
-            case 'description':
-                modalData.description = UserData.value.about || '';
-                break;
-            case 'contacts':
-                Object.assign(modalData, {
-                    email: UserData.value.email || '',
-                    phone: UserData.value.phoneNumber || '',
-                    telegram: UserData.value.telegram || '',
-                    github: UserData.value.github || ''
-                });
-                break;
-        }
+      alert('Ошибка при сохранении изменений');
     }
+  } finally {
+    isLoading.value = false;
+  }
+}
 
-    showModal.value = true;
+// Сброс изменений
+async function resetProfile() {
+  UserData.value = JSON.parse(JSON.stringify(originalUserData.value));
+}
+
+// Модальные окна
+const openModal = (type, index = -1) => {
+  modalType.value = type;
+  isEditing.value = index !== -1;
+  editingIndex.value = index;
+
+  // Сброс данных модального окна
+  Object.keys(modalData).forEach(key => modalData[key] = '');
+
+  if (isEditing.value) {
+    const item = getItemByType(type, index);
+    if (item) {
+      Object.assign(modalData, item);
+    }
+  } else {
+    // Заполнение данными пользователя для редактирования
+    switch (type) {
+      case 'name':
+        modalData.value = `${UserData.value.firstName || ''} ${UserData.value.lastName || ''}`.trim();
+        break;
+      case 'age':
+        modalData.value = UserData.value.age?.toString() || '';
+        break;
+      case 'description':
+        modalData.description = UserData.value.about || '';
+        break;
+      case 'contacts':
+        Object.assign(modalData, {
+          email: UserData.value.email || '',
+          phone: UserData.value.phoneNumber || '',
+          telegram: UserData.value.contacts?.telegram || '',
+          github: UserData.value.contacts?.github || ''
+        });
+        break;
+    }
+  }
+
+  showModal.value = true;
 };
 
 const closeModal = () => {
-    showModal.value = false;
-    setTimeout(() => {
-        modalType.value = '';
-        isEditing.value = false;
-        editingIndex.value = -1;
-    }, 300);
+  showModal.value = false;
+  setTimeout(() => {
+    modalType.value = '';
+    isEditing.value = false;
+    editingIndex.value = -1;
+  }, 300);
 };
 
+// Сохранение данных из модального окна
 const saveItem = async () => {
   if (!isFormValid.value) return;
 
@@ -737,12 +885,11 @@ const saveItem = async () => {
         UserData.value.about = modalData.description.trim();
         break;
       case 'contacts':
-        Object.assign(UserData.value, {
-          email: modalData.email.trim(),
-          phoneNumber: modalData.phone.trim(),
-          telegram: modalData.telegram.trim(),
-          github: modalData.github.trim()
-        });
+        UserData.value.email = modalData.email.trim();
+        UserData.value.phoneNumber = modalData.phone.trim();
+        if (!UserData.value.contacts) UserData.value.contacts = {};
+        UserData.value.contacts.telegram = modalData.telegram.trim();
+        UserData.value.contacts.github = modalData.github.trim();
         break;
       case 'workExperience':
         const workExp = {
@@ -751,7 +898,6 @@ const saveItem = async () => {
           period: modalData.period.trim(),
           achievements: modalData.achievements.trim()
         };
-        if (!UserData.value.workExperience) UserData.value.workExperience = [];
         if (isEditing.value) {
           UserData.value.workExperience[editingIndex.value] = workExp;
         } else {
@@ -765,7 +911,6 @@ const saveItem = async () => {
           institution: modalData.institution.trim(),
           year: parseInt(modalData.year)
         };
-        if (!UserData.value.education) UserData.value.education = [];
         if (isEditing.value) {
           UserData.value.education[editingIndex.value] = edu;
         } else {
@@ -773,7 +918,6 @@ const saveItem = async () => {
         }
         break;
       case 'skill':
-        if (!UserData.value.skills) UserData.value.skills = [];
         if (isEditing.value) {
           UserData.value.skills[editingIndex.value] = modalData.name.trim();
         } else {
@@ -785,47 +929,81 @@ const saveItem = async () => {
           language: modalData.language.trim(),
           level: modalData.level
         };
-        if (!UserData.value.languages) UserData.value.languages = [];
         if (isEditing.value) {
           UserData.value.languages[editingIndex.value] = lang;
         } else {
           UserData.value.languages.push(lang);
         }
         break;
+      case 'project':
+        const project = {
+          link: modalData.link.trim(),
+          description: modalData.description.trim()
+        };
+        if (isEditing.value) {
+          UserData.value.projects[editingIndex.value] = project;
+        } else {
+          UserData.value.projects.push(project);
+        }
+        break;
+      case 'social':
+        const social = {
+          social: modalData.social.trim(),
+          link: modalData.socialLink.trim()
+        };
+        if (isEditing.value) {
+          UserData.value.socials[editingIndex.value] = social;
+        } else {
+          UserData.value.socials.push(social);
+        }
+        break;
+      case 'achievement':
+        const achievement = {
+          text: modalData.achievementText.trim()
+        };
+        if (isEditing.value) {
+          UserData.value.achievements[editingIndex.value] = achievement;
+        } else {
+          UserData.value.achievements.push(achievement);
+        }
+        break;
     }
 
-
-    
     closeModal();
 
   } catch (error) {
     console.error('Ошибка при сохранении:', error);
+    alert('Ошибка при сохранении данных');
   }
 };
 
+// Удаление элементов
 const deleteItem = (type, index) => {
-    deleteType.value = type;
-    deleteIndex.value = index;
+  deleteType.value = type;
+  deleteIndex.value = index;
 
-    const item = getItemByType(type, index);
-    if (item) {
-        deletePreview.value = type === 'skill' ? item :
-            type === 'language' ? `${item.language} - ${item.level}` :
-            type === 'workExperience' ? `${item.title} в ${item.company}` :
-            type === 'education' ? `${item.degree} - ${item.field}` :
-            item.title || item.name || 'Элемент';
-    }
+  const item = getItemByType(type, index);
+  if (item) {
+    deletePreview.value = type === 'skill' ? item :
+        type === 'language' ? `${item.language} - ${item.level}` :
+        type === 'workExperience' ? `${item.title} в ${item.company}` :
+        type === 'education' ? `${item.degree} - ${item.field}` :
+        type === 'project' ? item.link :
+        type === 'social' ? `${item.social} - ${item.link}` :
+        type === 'achievement' ? item.text :
+        item.title || item.name || 'Элемент';
+  }
 
-    showDeleteConfirm.value = true;
+  showDeleteConfirm.value = true;
 };
 
 const closeDeleteConfirm = () => {
-    showDeleteConfirm.value = false;
-    setTimeout(() => {
-        deleteType.value = '';
-        deleteIndex.value = -1;
-        deletePreview.value = '';
-    }, 300);
+  showDeleteConfirm.value = false;
+  setTimeout(() => {
+    deleteType.value = '';
+    deleteIndex.value = -1;
+    deletePreview.value = '';
+  }, 300);
 };
 
 const confirmDelete = async () => {
@@ -843,53 +1021,120 @@ const confirmDelete = async () => {
       case 'language':
         UserData.value.languages.splice(deleteIndex.value, 1);
         break;
+      case 'project':
+        UserData.value.projects.splice(deleteIndex.value, 1);
+        break;
+      case 'social':
+        UserData.value.socials.splice(deleteIndex.value, 1);
+        break;
+      case 'achievement':
+        UserData.value.achievements.splice(deleteIndex.value, 1);
+        break;
     }
-
-
     
     closeDeleteConfirm();
 
   } catch (error) {
     console.error('Ошибка при удалении:', error);
+    alert('Ошибка при удалении элемента');
   }
 };
 
-
+// Вспомогательные функции
 const getItemByType = (type, index) => {
-    switch (type) {
-        case 'skill': return UserData.value.skills?.[index];
-        case 'workExperience': return UserData.value.workExperience?.[index];
-        case 'education': return UserData.value.education?.[index];
-        case 'language': return UserData.value.languages?.[index];
-        default: return null;
-    }
+  switch (type) {
+    case 'skill': return UserData.value.skills?.[index];
+    case 'workExperience': return UserData.value.workExperience?.[index];
+    case 'education': return UserData.value.education?.[index];
+    case 'language': return UserData.value.languages?.[index];
+    case 'project': return UserData.value.projects?.[index];
+    case 'social': return UserData.value.socials?.[index];
+    case 'achievement': return UserData.value.achievements?.[index];
+    default: return null;
+  }
 };
 
 const editItem = (type, index) => {
-    openModal(type, index);
+  openModal(type, index);
 };
 
+const setActiveMenuItem = (index) => {
+  activeMenuItem.value = index;
+};
 
-onMounted(async () => {
-    console.log('Компонент смонтирован в DOM!');
+// Computed для валидации формы
+const isFormValid = computed(() => {
+  switch (modalType.value) {
+    case 'name':
+    case 'age':
+      return modalData.value.trim().length > 0;
+    case 'description':
+      return modalData.description?.trim().length > 0;
+    case 'contacts':
+      return modalData.email.trim().length > 0 ||
+          modalData.phone.trim().length > 0 ||
+          modalData.telegram.trim().length > 0 ||
+          modalData.github.trim().length > 0;
+    case 'workExperience':
+      return modalData.title.trim().length > 0 &&
+          modalData.company.trim().length > 0 &&
+          modalData.period.trim().length > 0;
+    case 'education':
+      return modalData.degree.trim().length > 0 &&
+          modalData.field.trim().length > 0 &&
+          modalData.institution.trim().length > 0 &&
+          modalData.year > 0;
+    case 'skill':
+      return modalData.name.trim().length > 0;
+    case 'language':
+      return modalData.language.trim().length > 0 &&
+          modalData.level.trim().length > 0;
+    case 'project':
+      return modalData.link.trim().length > 0 &&
+          modalData.description.trim().length > 0;
+    case 'social':
+      return modalData.social.trim().length > 0 &&
+          modalData.socialLink.trim().length > 0;
+    case 'achievement':
+      return modalData.achievementText.trim().length > 0;
+    default:
+      return false;
+  }
+});
 
-    const BEARER_TOKEN = localStorage.getItem("token");
-    try {
-        const res = await axios.get("http://localhost:3000/auth/profile", {
-            headers: { 'Authorization': `Bearer ${BEARER_TOKEN}` }
-        });
-        console.log('Данные профиля:', res);
-        UserData.value = res.data.students || {};
-        originalUserData.value = { ...UserData.value };
-        
-        if (!UserData.value.workExperience) UserData.value.workExperience = [];
-        if (!UserData.value.education) UserData.value.education = [];
-        if (!UserData.value.skills) UserData.value.skills = [];
-        if (!UserData.value.languages) UserData.value.languages = [];
-        
-    } catch (error) {
-        console.error('Ошибка при загрузке профиля:', error);
-    }
+const modalTitle = computed(() => {
+  const types = {
+    name: 'Имя',
+    age: 'Возраст',
+    description: 'О себе',
+    contacts: 'Контакты',
+    education: 'Образование',
+    workExperience: 'Опыт работы',
+    skill: 'Навык',
+    language: 'Язык',
+    project: 'Проект',
+    social: 'Соцсеть',
+    achievement: 'Достижение'
+  };
+  const action = isEditing.value ? 'Редактирование' : 'Добавление';
+  return isEditing.value ? `Редактирование ${types[modalType.value]}` : `Добавление ${types[modalType.value]}`;
+});
+
+const fieldLabels = {
+  name: 'Имя и фамилия',
+  age: 'Возраст',
+  description: 'О себе'
+};
+
+const fieldPlaceholders = {
+  name: 'Введите имя и фамилию',
+  age: 'Например: 20 лет',
+  description: 'Расскажите о себе...'
+};
+
+// Загрузка профиля при монтировании
+onMounted(() => {
+  loadUserProfile();
 });
 </script>
 
