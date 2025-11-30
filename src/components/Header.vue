@@ -58,17 +58,20 @@ onMounted(() => {
 })
 
 const fetchUserProfile = async () => {
+  
   try {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token')
     if (!token) return null
     
     const res = await axios.get(`${API_URL}/users/profile/me`)
+      console.log(res.data);
     
     const userData = {
-      firstName: res.data.students?.firstName || 'Пользователь',
-      lastName: res.data.students?.lastName || '',
-      avatar: res.data.students?.avatar || null
+      firstName: res.data.user?.firstName || 'Пользователь',
+      lastName: res.data.user?.lastName || '',
+      avatar: res.data.user?.avatar || null
     }
+
     
     localStorage.setItem('user', JSON.stringify(userData))
     return userData
@@ -80,6 +83,7 @@ const fetchUserProfile = async () => {
 
 const checkAuth = async () => {
   const token = localStorage.getItem('token') || sessionStorage.getItem('token')
+  
   const userData = localStorage.getItem('user')
   
   if (token && token !== 'undefined' && token !== 'null') {

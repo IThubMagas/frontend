@@ -411,11 +411,6 @@ const menuItems = [
   { title: 'Опыт работы', id: "workExperience", blockId: "" },
 ];
 
-const setActiveMenuItem = (index) => {
-  activeMenuItem.value = index;
-};
-
-
 const route = useRoute();
 const id = ref(null);
 id.value = route.params.id;
