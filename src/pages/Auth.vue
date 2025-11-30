@@ -11,6 +11,11 @@
           </button>
         </div>
       </div>
+
+      <div v-if="message" class="message" :class="{ error: error, success: !error }">
+        {{ message }}
+      </div>
+
       <div class="card-body">
         <transition name="form-slide" mode="out-in">
           <div v-if="currentMode === 'login'" class="form-wrapper">
@@ -20,7 +25,8 @@
             <form @submit.prevent="handleLogin" class="auth-form">
               <div class="input-group">
                 <div class="input-wrapper">
-                  <input v-model="formData.email" type="email" placeholder="Email" class="form-input" required>
+                  <input v-model="formData.email" type="email" placeholder="Email" class="form-input"
+                    :class="{ 'error': errors.email }" @blur="validateField('email')" required>
                   <div class="input-icon">
                     <svg viewBox="0 0 24 24" fill="none">
                       <path
@@ -30,11 +36,13 @@
                     </svg>
                   </div>
                 </div>
+                <div v-if="errors.email" class="error-message">{{ errors.email }}</div>
               </div>
 
               <div class="input-group">
                 <div class="input-wrapper">
-                  <input v-model="formData.password" type="password" placeholder="Пароль" class="form-input" required>
+                  <input v-model="formData.password" :type="showPassword ? 'text' : 'password'" placeholder="Пароль"
+                    class="form-input" :class="{ 'error': errors.password }" @blur="validateField('password')" required>
                   <div class="input-icon">
                     <svg viewBox="0 0 24 24" fill="none">
                       <path
@@ -44,7 +52,20 @@
                         stroke-width="2" />
                     </svg>
                   </div>
+                  <button type="button" class="password-toggle" @click="showPassword = !showPassword">
+                    <svg v-if="showPassword" viewBox="0 0 24 24" fill="none">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" />
+                      <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                    <svg v-else viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                        stroke="currentColor" stroke-width="2" />
+                      <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                  </button>
                 </div>
+                <div v-if="errors.password" class="error-message">{{ errors.password }}</div>
               </div>
 
               <div class="form-options">
@@ -57,14 +78,13 @@
                 </button>
               </div>
 
-              <button type="submit" class="submit-btn" :disabled="loading">
+              <button type="submit" class="submit-btn" :disabled="loading || !isFormValid">
                 <span v-if="loading" class="btn-loading">
                   <div class="spinner"></div>
                   Вход...
                 </span>
                 <span v-else>Войти</span>
               </button>
-
 
               <div class="form-footer">
                 <p>Нет аккаунта?
@@ -84,7 +104,8 @@
               <div class="name-grid">
                 <div class="input-group">
                   <div class="input-wrapper">
-                    <input v-model="formData.firstName" type="text" placeholder="Имя" class="form-input" required>
+                    <input v-model="formData.firstName" type="text" placeholder="Имя" class="form-input"
+                      :class="{ 'error': errors.firstName }" @blur="validateField('firstName')" required>
                     <div class="input-icon">
                       <svg viewBox="0 0 24 24" fill="none">
                         <path d="M20 21V19C20 16.7909 18.2091 15 16 15H8C5.79086 15 4 16.7909 4 19V21"
@@ -95,11 +116,13 @@
                       </svg>
                     </div>
                   </div>
+                  <div v-if="errors.firstName" class="error-message">{{ errors.firstName }}</div>
                 </div>
 
                 <div class="input-group">
                   <div class="input-wrapper">
-                    <input v-model="formData.lastName" type="text" placeholder="Фамилия" class="form-input" required>
+                    <input v-model="formData.lastName" type="text" placeholder="Фамилия" class="form-input"
+                      :class="{ 'error': errors.lastName }" @blur="validateField('lastName')" required>
                     <div class="input-icon">
                       <svg viewBox="0 0 24 24" fill="none">
                         <path d="M20 21V19C20 16.7909 18.2091 15 16 15H8C5.79086 15 4 16.7909 4 19V21"
@@ -110,12 +133,14 @@
                       </svg>
                     </div>
                   </div>
+                  <div v-if="errors.lastName" class="error-message">{{ errors.lastName }}</div>
                 </div>
               </div>
 
               <div class="input-group">
                 <div class="input-wrapper">
-                  <input v-model="formData.patronymic" type="text" placeholder="Отчество" class="form-input" required>
+                  <input v-model="formData.patronymic" type="text" placeholder="Отчество" class="form-input"
+                    @blur="validateField('patronymic')">
                   <div class="input-icon">
                     <svg viewBox="0 0 24 24" fill="none">
                       <path d="M20 21V19C20 16.7909 18.2091 15 16 15H8C5.79086 15 4 16.7909 4 19V21"
@@ -126,11 +151,13 @@
                     </svg>
                   </div>
                 </div>
+                <div v-if="errors.patronymic" class="error-message">{{ errors.patronymic }}</div>
               </div>
 
               <div class="input-group">
                 <div class="input-wrapper">
-                  <input v-model="formData.email" type="email" placeholder="Email" class="form-input" required>
+                  <input v-model="formData.email" type="email" placeholder="Email" class="form-input"
+                    :class="{ 'error': errors.email }" @blur="validateField('email')" required>
                   <div class="input-icon">
                     <svg viewBox="0 0 24 24" fill="none">
                       <path
@@ -140,11 +167,14 @@
                     </svg>
                   </div>
                 </div>
+                <div v-if="errors.email" class="error-message">{{ errors.email }}</div>
               </div>
 
               <div class="input-group">
                 <div class="input-wrapper">
-                  <input v-model="formData.phoneNumber" type="tel" placeholder="Телефон" class="form-input">
+                  <input v-model="formData.phoneNumber" type="tel" placeholder="+7 (999) 999-99-99" class="form-input"
+                    :class="{ 'error': errors.phoneNumber }" @input="handlePhoneInput" @keydown="handlePhoneKeyDown"
+                    @blur="validateField('phoneNumber')">
                   <div class="input-icon">
                     <svg viewBox="0 0 24 24" fill="none">
                       <path
@@ -153,11 +183,13 @@
                     </svg>
                   </div>
                 </div>
+                <div v-if="errors.phoneNumber" class="error-message">{{ errors.phoneNumber }}</div>
               </div>
 
               <div class="input-group">
                 <div class="input-wrapper">
-                  <input v-model="formData.password" type="password" placeholder="Пароль" class="form-input" required>
+                  <input v-model="formData.password" :type="showPassword ? 'text' : 'password'" placeholder="Пароль"
+                    class="form-input" :class="{ 'error': errors.password }" @blur="validateField('password')" required>
                   <div class="input-icon">
                     <svg viewBox="0 0 24 24" fill="none">
                       <path
@@ -167,13 +199,30 @@
                         stroke-width="2" />
                     </svg>
                   </div>
+                  <button type="button" class="password-toggle" @click="showPassword = !showPassword">
+                    <svg v-if="showPassword" viewBox="0 0 24 24" fill="none">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" />
+                      <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                    <svg v-else viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                        stroke="currentColor" stroke-width="2" />
+                      <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                  </button>
+                </div>
+                <div v-if="errors.password" class="error-message">{{ errors.password }}</div>
+                <div v-if="passwordStrength" class="password-strength" :class="passwordStrength">
+                  Сложность пароля: {{ passwordStrengthText }}
                 </div>
               </div>
 
               <div class="input-group">
                 <div class="input-wrapper">
-                  <input v-model="formData.confirmPassword" type="password" placeholder="Подтвердите пароль"
-                    class="form-input" required>
+                  <input v-model="formData.confirmPassword" :type="showConfirmPassword ? 'text' : 'password'"
+                    placeholder="Подтвердите пароль" class="form-input" :class="{ 'error': errors.confirmPassword }"
+                    @blur="validateField('confirmPassword')" required>
                   <div class="input-icon">
                     <svg viewBox="0 0 24 24" fill="none">
                       <path
@@ -183,10 +232,23 @@
                         stroke-width="2" />
                     </svg>
                   </div>
+                  <button type="button" class="password-toggle" @click="showConfirmPassword = !showConfirmPassword">
+                    <svg v-if="showConfirmPassword" viewBox="0 0 24 24" fill="none">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" />
+                      <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                    <svg v-else viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                        stroke="currentColor" stroke-width="2" />
+                      <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                  </button>
                 </div>
+                <div v-if="errors.confirmPassword" class="error-message">{{ errors.confirmPassword }}</div>
               </div>
 
-              <button type="submit" class="submit-btn" :disabled="loading">
+              <button type="submit" class="submit-btn" :disabled="loading || !isFormValid">
                 <span v-if="loading" class="btn-loading">
                   <div class="spinner"></div>
                   Регистрация...
@@ -203,6 +265,7 @@
               </div>
             </form>
           </div>
+
 
           <div v-else-if="currentMode === 'verify'" class="form-wrapper">
             <h2 class="form-title">Подтверждение email</h2>
@@ -347,18 +410,22 @@
     </div>
   </div>
 </template>
-
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth.js'
 import axios from 'axios'
 
 const router = useRouter()
+const authStore = useAuthStore()
+
 const currentMode = ref('login')
 const rememberMe = ref(false)
 const loading = ref(false)
 const message = ref('')
 const error = ref(false)
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
 
 const formData = reactive({
   email: '',
@@ -372,18 +439,166 @@ const formData = reactive({
   resetCode: ''
 })
 
-const API_URL = 'http://localhost:3000/auth'
-
-onMounted(() => {
-  animateBackground()
+const errors = reactive({
+  email: '',
+  password: '',
+  confirmPassword: '',
+  firstName: '',
+  lastName: '',
+  patronymic: '',
+  phoneNumber: ''
 })
 
-const animateBackground = () => {
-  const shapes = document.querySelectorAll('.shape')
-  shapes.forEach((shape, index) => {
-    shape.style.animation = `float ${6 + index * 2}s ease-in-out infinite ${index * 0.5}s`
-  })
+const validateField = (field) => {
+  const value = formData[field]
+  
+  switch (field) {
+    case 'email':
+      if (!value) {
+        errors.email = 'Email обязателен'
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        errors.email = 'Введите корректный email'
+      } else {
+        errors.email = ''
+      }
+      break
+      
+    case 'password':
+      if (!value) {
+        errors.password = 'Пароль обязателен'
+      } else if (value.length < 6) {
+        errors.password = 'Пароль должен быть не менее 6 символов'
+      } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
+        errors.password = 'Пароль должен содержать заглавные, строчные буквы и цифры'
+      } else {
+        errors.password = ''
+      }
+      break
+      
+    case 'confirmPassword':
+      if (!value) {
+        errors.confirmPassword = 'Подтверждение пароля обязательно'
+      } else if (value !== formData.password) {
+        errors.confirmPassword = 'Пароли не совпадают'
+      } else {
+        errors.confirmPassword = ''
+      }
+      break
+      
+    case 'firstName':
+      if (!value) {
+        errors.firstName = 'Имя обязательно'
+      } else if (value.length < 2) {
+        errors.firstName = 'Имя должно быть не менее 2 символов'
+      } else if (!/^[a-zA-Zа-яА-ЯёЁ\s-]+$/.test(value)) {
+        errors.firstName = 'Имя может содержать только буквы, пробелы и дефисы'
+      } else {
+        errors.firstName = ''
+      }
+      break
+      
+    case 'lastName':
+      if (!value) {
+        errors.lastName = 'Фамилия обязательна'
+      } else if (value.length < 2) {
+        errors.lastName = 'Фамилия должна быть не менее 2 символов'
+      } else if (!/^[a-zA-Zа-яА-ЯёЁ\s-]+$/.test(value)) {
+        errors.lastName = 'Фамилия может содержать только буквы, пробелы и дефисы'
+      } else {
+        errors.lastName = ''
+      }
+      break
+      
+    case 'patronymic':
+      if (value && !/^[a-zA-Zа-яА-ЯёЁ\s-]+$/.test(value)) {
+        errors.patronymic = 'Отчество может содержать только буквы, пробелы и дефисы'
+      } else {
+        errors.patronymic = ''
+      }
+      break
+      
+    case 'phoneNumber':
+      if (value) {
+        const cleanPhone = value.replace(/\D/g, '')
+        if ((cleanPhone.startsWith('7') || cleanPhone.startsWith('8')) && cleanPhone.length !== 11) {
+          errors.phoneNumber = 'Номер должен содержать 11 цифр'
+        } else if (cleanPhone.length > 0 && (cleanPhone.length < 10 || cleanPhone.length > 15)) {
+          errors.phoneNumber = 'Номер должен содержать от 10 до 15 цифр'
+        } else {
+          errors.phoneNumber = ''
+        }
+      } else {
+        errors.phoneNumber = ''
+      }
+      break
+  }
 }
+
+const formatPhoneNumber = () => {
+  let numbers = formData.phoneNumber.replace(/\D/g, '')
+  
+  if (numbers.startsWith('7') || numbers.startsWith('8')) {
+    numbers = numbers.substring(1)
+  }
+  
+  numbers = numbers.substring(0, 10)
+  
+  let formatted = '+7'
+  
+  if (numbers.length > 0) {
+    formatted += ' (' + numbers.substring(0, 3)
+  }
+  if (numbers.length > 3) {
+    formatted += ') ' + numbers.substring(3, 6)
+  }
+  if (numbers.length > 6) {
+    formatted += '-' + numbers.substring(6, 8)
+  }
+  if (numbers.length > 8) {
+    formatted += '-' + numbers.substring(8, 10)
+  }
+  
+  formData.phoneNumber = formatted
+}
+
+const handlePhoneInput = () => {
+  formatPhoneNumber()
+}
+
+const isFormValid = computed(() => {
+  switch (currentMode.value) {
+    case 'login':
+      return formData.email && formData.password && !errors.email && !errors.password
+    case 'signup':
+      return formData.email && 
+             formData.password && 
+             formData.confirmPassword && 
+             formData.firstName && 
+             formData.lastName &&
+             !errors.email && 
+             !errors.password && 
+             !errors.confirmPassword && 
+             !errors.firstName && 
+             !errors.lastName
+    case 'verify':
+      return formData.verificationCode && formData.verificationCode.length === 6
+    case 'forgot':
+      return formData.email && !errors.email
+    case 'reset':
+      return formData.resetCode && formData.password && formData.confirmPassword && 
+             !errors.password && !errors.confirmPassword
+    default:
+      return true
+  }
+})
+
+watch(currentMode, () => {
+  Object.keys(errors).forEach(key => errors[key] = '')
+  message.value = ''
+  error.value = false
+  showPassword.value = false
+  showConfirmPassword.value = false
+})
 
 const switchTo = (mode) => {
   currentMode.value = mode
@@ -391,67 +606,108 @@ const switchTo = (mode) => {
   error.value = false
 }
 
-const setToken = (token) => {
-  if (token) {
-    if (rememberMe.value) {
-      localStorage.setItem('token', token)
-    } else {
-      sessionStorage.setItem('token', token)
-    }
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-  }
-}
-
 const handleLogin = async () => {
-  if (!formData.email || !formData.password) return
+  if (!isFormValid.value) return
+  
   loading.value = true
   message.value = ''
-
+  
   try {
-    const res = await axios.post(`${API_URL}/login`, {
+    console.log('Отправка запроса на вход...')
+
+    const response = await axios.post('http://localhost:3000/auth/login', {
       email: formData.email,
       password: formData.password
     })
 
-    if (res.data.token) {
-      setToken(res.data.token)
-      message.value = 'Вход успешен!'
+    console.log('Успешный ответ сервера:', response.data)
+
+    if (response.data.token) {
+      const token = response.data.token
+      if (rememberMe.value) {
+        localStorage.setItem('token', token)
+      } else {
+        sessionStorage.setItem('token', token)
+      }
+      
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      
+      message.value = response.data.message || 'Вход успешен!'
       error.value = false
-      setTimeout(() => router.push('/profile'), 1000)
+      
+      console.log('Токен сохранен, загружаем профиль...')
+      
+      try {
+        await authStore.loadUserProfile()
+        console.log('Профиль загружен, переходим...')
+        
+        setTimeout(() => {
+          router.push('/profile')
+        }, 1000)
+      } catch (profileError) {
+        console.error('Ошибка загрузки профиля:', profileError)
+        setTimeout(() => {
+          router.push('/profile')
+        }, 1000)
+      }
     } else {
       message.value = 'Токен не получен от сервера'
       error.value = true
     }
   } catch (err) {
-    message.value = err.response?.data?.message || 'Ошибка входа'
-    error.value = true
+    console.error('Login error:', err)
+    
+    if (err.response?.data?.token) {
+      const token = err.response.data.token
+      localStorage.setItem('token', token)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      
+      message.value = err.response.data.message || 'Вход успешен!'
+      error.value = false
+      
+      setTimeout(() => {
+        router.push('/profile')
+      }, 1000)
+    } else {
+      message.value = err.response?.data?.message || 'Ошибка входа. Проверьте email и пароль.'
+      error.value = true
+    }
   } finally {
     loading.value = false
   }
 }
 
 const handleSignup = async () => {
-  if (formData.password !== formData.confirmPassword) {
-    message.value = 'Пароли не совпадают'
-    error.value = true
-    return
-  }
+  if (!isFormValid.value) return
+  
   loading.value = true
-
+  
   try {
-    const res = await axios.post(`${API_URL}/registration`, {
+    const registrationData = {
       firstName: formData.firstName,
       lastName: formData.lastName,
       patronymic: formData.patronymic,
       email: formData.email,
-      phoneNumber: formData.phoneNumber || '',
       password: formData.password
-    })
+    }
 
-    message.value = 'Код отправлен на email!'
-    error.value = false
-    switchTo('verify')
+    if (formData.phoneNumber && !errors.phoneNumber) {
+      registrationData.phoneNumber = formData.phoneNumber.replace(/\D/g, '')
+    }
+
+    const response = await axios.post('http://localhost:3000/auth/registration', registrationData)
+    
+    if (response.data.message) {
+      message.value = response.data.message || 'Регистрация успешна! Код подтверждения отправлен на email.'
+      error.value = false
+      switchTo('verify')
+    } else {
+      message.value = 'Ошибка при регистрации'
+      error.value = true
+    }
   } catch (err) {
+    console.error('Registration error:', err)
+    
     if (err.response?.data?.errors) {
       const errors = err.response.data.errors
       message.value = errors.map(e => e.msg).join(', ')
@@ -465,24 +721,33 @@ const handleSignup = async () => {
 }
 
 const handleVerifyEmail = async () => {
+  if (!isFormValid.value) return
+  
   loading.value = true
   try {
-    const res = await axios.post(`${API_URL}/verify-email`, {
+    const response = await axios.post('http://localhost:3000/auth/verify-email', {
       email: formData.email,
       code: formData.verificationCode
     })
 
-    if (res.data.token) {
-      setToken(res.data.token)
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`
+      
       message.value = 'Email подтверждён!'
       error.value = false
-      setTimeout(() => router.push('/dashboard'), 1000)
+      
+      authStore.setToken(response.data.token)
+      authStore.setUser(response.data.user)
+      
+      setTimeout(() => router.push('/profile'), 1000)
     } else {
       message.value = 'Токен не получен после подтверждения'
       error.value = true
     }
   } catch (err) {
-    message.value = err.response?.data?.message || 'Неверный код'
+    console.error('Verify email error:', err)
+    message.value = err.response?.data?.message || 'Неверный код подтверждения'
     error.value = true
   } finally {
     loading.value = false
@@ -492,11 +757,15 @@ const handleVerifyEmail = async () => {
 const resendCode = async () => {
   loading.value = true
   try {
-    await axios.post(`${API_URL}/resend-verify`, { email: formData.email })
-    message.value = 'Новый код отправлен!'
+    const response = await axios.post('http://localhost:3000/auth/resend-verify', { 
+      email: formData.email 
+    })
+    
+    message.value = response.data.message || 'Новый код отправлен!'
     error.value = false
   } catch (err) {
-    message.value = err.response?.data?.message || 'Ошибка'
+    console.error('Resend code error:', err)
+    message.value = err.response?.data?.message || 'Ошибка отправки кода'
     error.value = true
   } finally {
     loading.value = false
@@ -504,14 +773,20 @@ const resendCode = async () => {
 }
 
 const handleForgot = async () => {
+  if (!isFormValid.value) return
+  
   loading.value = true
   try {
-    await axios.post(`${API_URL}/forgot-password`, { email: formData.email })
-    message.value = 'Код отправлен на email!'
+    const response = await axios.post('http://localhost:3000/auth/forgot-password', { 
+      email: formData.email 
+    })
+    
+    message.value = response.data.message || 'Код восстановления отправлен на email!'
     error.value = false
     switchTo('reset')
   } catch (err) {
-    message.value = err.response?.data?.message || 'Ошибка'
+    console.error('Forgot password error:', err)
+    message.value = err.response?.data?.message || 'Ошибка восстановления пароля'
     error.value = true
   } finally {
     loading.value = false
@@ -519,39 +794,38 @@ const handleForgot = async () => {
 }
 
 const handleReset = async () => {
-  if (formData.password !== formData.confirmPassword) {
-    message.value = 'Пароли не совпадают'
-    error.value = true
-    return
-  }
+  if (!isFormValid.value) return
+  
   loading.value = true
   try {
-    const res = await axios.post(`${API_URL}/reset-password`, {
+    const response = await axios.post('http://localhost:3000/auth/reset-password', {
       email: formData.email,
       resetCode: formData.resetCode,
       newPassword: formData.password
     })
 
-    if (res.data.token) {
-      setToken(res.data.token)
-      message.value = 'Пароль сброшен!'
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`
+      
+      message.value = 'Пароль успешно сброшен!'
       error.value = false
-      setTimeout(() => router.push('/dashboard'), 1000)
+      
+      authStore.setToken(response.data.token)
+      authStore.setUser(response.data.user)
+      
+      setTimeout(() => router.push('/profile'), 1000)
     } else {
       message.value = 'Токен не получен после сброса пароля'
       error.value = true
     }
   } catch (err) {
-    message.value = err.response?.data?.message || 'Ошибка сброса'
+    console.error('Reset password error:', err)
+    message.value = err.response?.data?.message || 'Ошибка сброса пароля'
     error.value = true
   } finally {
     loading.value = false
   }
-}
-
-const handleGoogleSignIn = () => {
-  message.value = 'Google Sign-In будет доступен скоро'
-  error.value = false
 }
 </script>
 <style scoped>
@@ -565,47 +839,6 @@ const handleGoogleSignIn = () => {
   overflow: hidden;
 }
 
-
-.glowing-orbs {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
-
-.orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(40px);
-  opacity: 0.3;
-}
-
-.orb-1 {
-  width: 200px;
-  height: 200px;
-  background: #ff6b6b;
-  top: 10%;
-  left: 5%;
-}
-
-.orb-2 {
-  width: 300px;
-  height: 300px;
-  background: #4ecdc4;
-  bottom: 10%;
-  right: 5%;
-}
-
-.orb-3 {
-  width: 150px;
-  height: 150px;
-  background: #45b7d1;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-
-
 .auth-card {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
@@ -617,6 +850,27 @@ const handleGoogleSignIn = () => {
   border: 1px solid rgba(255, 255, 255, 0.3);
   position: relative;
   z-index: 10;
+}
+
+.message {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
 }
 
 .card-header {
@@ -679,7 +933,9 @@ const handleGoogleSignIn = () => {
   position: relative;
 }
 
-
+.input-wrapper {
+  position: relative;
+}
 
 .form-input {
   width: 100%;
@@ -704,6 +960,10 @@ const handleGoogleSignIn = () => {
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.form-input.error {
+  border-color: #e53e3e;
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+}
 
 .input-icon {
   position: absolute;
@@ -715,6 +975,54 @@ const handleGoogleSignIn = () => {
   height: 20px;
 }
 
+.password-toggle {
+  position: absolute;
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #cbd5e0;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+  z-index: 2;
+}
+
+.password-toggle:hover {
+  color: #667eea;
+}
+
+.password-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.error-message {
+  color: #e53e3e;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.password-strength {
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.password-strength.weak {
+  color: #e53e3e;
+}
+
+.password-strength.medium {
+  color: #d69e2e;
+}
+
+.password-strength.strong {
+  color: #38a169;
+}
 
 .form-options {
   display: flex;
@@ -727,30 +1035,23 @@ const handleGoogleSignIn = () => {
   display: flex;
   align-items: center;
   gap: 8px;
-  cursor: pointer;
   font-size: 14px;
   color: #4a5568;
+  cursor: pointer;
 }
 
 .checkbox-input {
   width: 18px;
   height: 18px;
   border-radius: 4px;
-  position: relative;
-  accent-color: #667eea;
+  border: 2px solid #cbd5e0;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-
-.checkbox-input:checked+.checkmark::after {
-  content: '';
-  position: absolute;
-  left: 4px;
-  top: 1px;
-  width: 6px;
-  height: 10px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
+.checkbox-input:checked {
+  background-color: #667eea;
+  border-color: #667eea;
 }
 
 .text-link {
@@ -760,6 +1061,7 @@ const handleGoogleSignIn = () => {
   font-size: 14px;
   cursor: pointer;
   text-decoration: underline;
+  transition: color 0.2s ease;
 }
 
 .text-link:hover {
@@ -781,14 +1083,16 @@ const handleGoogleSignIn = () => {
 }
 
 .submit-btn:hover:not(:disabled) {
+  background-color: #4a4dff;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 25px rgba(94, 97, 255, 0.3);
 }
 
 .submit-btn:disabled {
-  opacity: 0.7;
+  background-color: #cbd5e0;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 .btn-loading {
@@ -812,33 +1116,6 @@ const handleGoogleSignIn = () => {
     transform: rotate(360deg);
   }
 }
-
-
-.social-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 12px;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  background: white;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.social-btn:hover {
-  border-color: #667eea;
-  transform: translateY(-1px);
-}
-
-.social-icon {
-  width: 20px;
-  height: 20px;
-}
-
 
 .form-footer {
   text-align: center;
@@ -866,5 +1143,37 @@ const handleGoogleSignIn = () => {
 .form-slide-leave-to {
   opacity: 0;
   transform: translateX(-20px);
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 24px;
+    margin: 16px;
+  }
+
+  .name-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .form-title {
+    font-size: 24px;
+  }
+
+  .form-subtitle {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .auth-card {
+    padding: 20px;
+  }
+
+  .form-options {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
 }
 </style>
