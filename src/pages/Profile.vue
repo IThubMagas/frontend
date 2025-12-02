@@ -6,7 +6,7 @@
                 <li v-for="(item, index) in menuItems" :key="item.id" 
                     class="py-5 pl-5 bg gap-y-1 bg-white text-sm font-semibold">
                     <a :href="`#${item.id}`" @click="setActiveMenuItem(index)" 
-                       :class="{ 'text-[#5E61FF]': activeMenuItem === index }">
+                      :class="{ 'text-[#5E61FF]': activeMenuItem === index }">
                         {{ item.title }}
                     </a>
                 </li>
@@ -16,25 +16,28 @@
         <div class="profile-main min-w-[896px]">
             <!-- Заголовок с фото и основной информацией -->
             <div class="profile-header" id="general">
-                <h2 class="text-[32px] font-semibold">Мой профиль</h2>
-                <div class="profile-avatar flex mt-8 items-center gap-6">
-                    <div class="relative">
-                        <img 
-                            :src="UserData.avatar ? `http://localhost:3000/uploads/avatars/${UserData.avatar}` : '/default-profile.png'" 
-                            class="w-[84px] h-[84px] rounded-full" 
-                            alt="Фото профиля">
-                        <button @click="openModal('photo')" class="absolute bottom-0 right-0 bg-[#5E61FF] text-white rounded-full w-6 h-6 flex items-center justify-center">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2"/>
-                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="gap-4 flex">
-                        <button class="py-3 px-6 min-w-[115px] bg-[#5E61FF] rounded-lg text-white font-semibold">Загрузить фото</button>
-                        <button class="py-3 px-6 min-w-[173px] bg-white rounded-lg font-semibold">Удалить</button>
-                    </div>
-                </div>
+    <h2 class="text-[32px] font-semibold">Мой профиль</h2>
+    <div class="profile-avatar flex mt-8 items-center gap-6">
+        <div class="relative">
+            <img 
+                :src="avatarPreview || (UserData.avatar ? `http://localhost:3000/uploads/avatars/${UserData.avatar}` : 'images/placeholders/avatar.png')" 
+                class="w-[120px] h-[120px] rounded-full object-cover" 
+                alt="Фото профиля">
+        </div>
+        <div class="gap-4 flex">
+            <label class="py-3 px-6 min-w-[115px] bg-[#5E61FF] rounded-lg text-white font-semibold cursor-pointer">
+                Загрузить
+                <input 
+                    type="file" 
+                    accept="image/*"
+                    @change="handleFileSelect"
+                    class="hidden">
+            </label>
+            <button 
+                @click="removeAvatar"
+                class="py-3 px-6 min-w-[173px] bg-white rounded-lg font-semibold">Удалить</button>
+        </div>
+    </div>
                 
                 <!-- Основная информация -->
                 <div class="flex gap-3 mt-8">
@@ -586,6 +589,8 @@ const menuItems = [
 const UserData = ref({});
 const originalUserData = ref({});
 const isLoading = ref(false);
+const avatarPreview = ref(null);
+
 
 // Computed properties для удобства
 const workExperience = computed(() => UserData.value.workExperience || []);
@@ -723,6 +728,7 @@ async function updateUser() {
     formData.append('firstName', UserData.value.firstName);
     formData.append('lastName', UserData.value.lastName);
     formData.append('patronymic', UserData.value.patronymic);
+    formData.append('avatar', UserData.value.avatar);
     formData.append('email', UserData.value.email);
     formData.append('phoneNumber', UserData.value.phoneNumber);
     formData.append('age', UserData.value.age);
@@ -796,17 +802,11 @@ async function updateUser() {
 
     if (UserData.value.achievements && Array.isArray(UserData.value.achievements)) {
       UserData.value.achievements.forEach((achievement, index) => {
-        if (achievement.title) {
-          formData.append(`achievements[${index}][title]`, achievement.title);
+        if (achievement.text) {
+          formData.append(`achievements[${index}][text]`, achievement.text);
         }
-        if (achievement.description) {
-          formData.append(`achievements[${index}][description]`, achievement.description);
-        }
-        if (achievement.date) {
-          formData.append(`achievements[${index}][date]`, achievement.date);
-        }
-        if (achievement.fileId) {
-          formData.append(`achievements[${index}][fileId]`, achievement.fileId);
+        if(typeof achievement.file === 'string') {
+          formData.append(`achievements[${index}][file]`, achievement.file);
         }
       });
 
@@ -827,11 +827,10 @@ async function updateUser() {
         }
       }
     );
-    
+
     console.log('Профиль обновлен:', response.data);
     originalUserData.value = JSON.parse(JSON.stringify(UserData.value));
     alert('Профиль успешно обновлен!');
-    
   } catch (error) {
     console.error('Ошибка при обновлении профиля:', error);
     if (error.response?.data?.message) {
@@ -1082,18 +1081,78 @@ const handleFileUpload = (event) => {
   modalData.file = event.target.files[0];
 }
 
-const downloadFile = (file) => {
+const downloadFile = async (file) => {
   if (!file) return;
 
-  const url = URL.createObjectURL(file);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = file.name;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-}
+  if (typeof file === 'string') {
+    if (!file.startsWith('http')) {
+      file = `http://localhost:3000/uploads/achievements/${file}`;
+    }
+    
+    try {
+      const response = await fetch(file);
+      
+      if (!response.ok) {
+        throw new Error(`Ошибка загрузки: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+
+      const urlParts = file.split('/');
+      let fileName = urlParts[urlParts.length - 1];
+
+      const contentDisposition = response.headers.get('content-disposition');
+      if (contentDisposition) {
+        const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
+        if (fileNameMatch && fileNameMatch[1]) {
+          fileName = fileNameMatch[1];
+        }
+      }
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+    } catch (error) {
+      console.error('Ошибка скачивания файла:', error);
+    }
+  }
+  else if (file instanceof Blob) {
+    const url = URL.createObjectURL(file);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = file.name || 'file';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+};
+
+const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    
+    if (file) {
+        UserData.value.avatar = file;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            avatarPreview.value = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+const removeAvatar = () => {
+    UserData.value.avatar = null;
+    avatarPreview.value = null;
+};
+
 
 const editItem = (type, index) => {
   openModal(type, index);
