@@ -728,7 +728,7 @@ async function updateUser() {
     formData.append('firstName', UserData.value.firstName);
     formData.append('lastName', UserData.value.lastName);
     formData.append('patronymic', UserData.value.patronymic);
-    formData.append('avatar', UserData.value.avatar);
+    formData.append('avatar', UserData.value.avatar ? UserData.value.avatar : 'DELETE_AVATAR');
     formData.append('email', UserData.value.email);
     formData.append('phoneNumber', UserData.value.phoneNumber);
     formData.append('age', UserData.value.age);
@@ -738,6 +738,8 @@ async function updateUser() {
     formData.append('industry', UserData.value.industry);
     formData.append('workFormat', UserData.value.workFormat);
     formData.append('employmentType', UserData.value.employmentType);
+    formData.append('currentPassword', UserData.value.oldPassword);
+    formData.append('newPassword', UserData.value.newPassword);
 
     if (UserData.value.workExperience) {
       if (Array.isArray(UserData.value.workExperience)) {
