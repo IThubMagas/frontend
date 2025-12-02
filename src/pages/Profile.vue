@@ -14,7 +14,6 @@
         </div>
 
         <div class="profile-main min-w-[896px]">
-            <!-- Заголовок с фото и основной информацией -->
             <div class="profile-header" id="general">
     <h2 class="text-[32px] font-semibold">Мой профиль</h2>
     <div class="profile-avatar flex mt-8 items-center gap-6">
@@ -171,7 +170,6 @@
                 </div>
             </div>
 
-            <!-- Навыки -->
             <div class="mt-[60px]" id="skills">
                 <div class="flex justify-between items-center mb-4">
                     <p class="font-semibold text-[20px]">Навыки</p>
@@ -205,7 +203,6 @@
                 </div>
             </div>
 
-            <!-- Языки -->
             <div class="mt-[60px]" id="languages">
                 <div class="flex justify-between items-center mb-4">
                     <p class="font-semibold text-[20px]">Языки</p>
@@ -241,7 +238,6 @@
                 </div>
             </div>
 
-            <!-- Опыт работы -->
             <div class="mt-[60px]" id="workExperience">
                 <div class="flex justify-between items-center mb-4">
                     <p class="font-semibold text-[20px]">Опыт работы</p>
@@ -482,7 +478,6 @@
                   <p v-if="modalData.file">Выбран файл: {{ modalData.file.name }}</p>
                 </div>
 
-                <!-- Контакты -->
                 <div v-else-if="modalType === 'contacts'" class="form-group">
                     <label class="form-label">Email</label>
                     <input v-model="modalData.email" type="email" class="form-input" placeholder="email@example.com"/>
@@ -496,7 +491,6 @@
                         placeholder="Например: Test123"/>
                 </div>
 
-                <!-- Образование -->
                 <div v-else-if="modalType === 'education'" class="form-group">
                     <label class="form-label">Степень</label>
                     <input v-model="modalData.degree" type="text" class="form-input" placeholder="Bachelor of Science"/>
@@ -509,7 +503,6 @@
                     <input v-model="modalData.year" type="number" class="form-input" placeholder="2018"/>
                 </div>
 
-                <!-- Опыт работы -->
                 <div v-else-if="modalType === 'workExperience'" class="form-group">
                     <label class="form-label">Должность</label>
                     <input v-model="modalData.title" type="text" class="form-input" placeholder="Frontend Developer"/>
@@ -522,13 +515,11 @@
                         placeholder="Опишите ваши достижения на этой должности..."></textarea>
                 </div>
 
-                <!-- Навыки -->
                 <div v-else-if="modalType === 'skill'" class="form-group">
                     <label class="form-label">Название навыка</label>
                     <input v-model="modalData.name" type="text" class="form-input" placeholder="Например: JavaScript"/>
                 </div>
 
-                <!-- Языки -->
                 <div v-else-if="modalType === 'language'" class="form-group">
                     <label class="form-label">Язык</label>
                     <input v-model="modalData.language" type="text" class="form-input" placeholder="Например: Английский"/>
@@ -548,7 +539,6 @@
         </div>
     </div>
 
-    <!-- Подтверждение удаления -->
     <div v-if="showDeleteConfirm" class="modal-overlay" @click="closeDeleteConfirm">
         <div class="modal-content confirm-modal" @click.stop>
             <div class="modal-header">
@@ -592,7 +582,6 @@ const isLoading = ref(false);
 const avatarPreview = ref(null);
 
 
-// Computed properties для удобства
 const workExperience = computed(() => UserData.value.workExperience || []);
 const education = computed(() => UserData.value.education || []);
 const skills = computed(() => UserData.value.skills || []);
@@ -607,7 +596,6 @@ const hasContacts = computed(() =>
     (UserData.value.contacts && (UserData.value.contacts.telegram || UserData.value.contacts.github))
 );
 
-// Модальные окна состояния
 const showModal = ref(false);
 const modalType = ref('');
 const isEditing = ref(false);
@@ -638,13 +626,11 @@ const modalData = reactive({
     file: null
 });
 
-// Удаление состояния
 const showDeleteConfirm = ref(false);
 const deleteType = ref('');
 const deleteIndex = ref(-1);
 const deletePreview = ref('');
 
-// Опции для селектов
 const selected = ref('Not looking');
 const statusOptions = ref([
   { text: 'Не ищу работу', value: 'Not looking' },
@@ -690,7 +676,6 @@ const getAuthHeaders = () => {
   };
 };
 
-// Загрузка профиля
 async function loadUserProfile() {
   isLoading.value = true;
   try {
@@ -701,7 +686,6 @@ async function loadUserProfile() {
     UserData.value = response.data.user || {};
     originalUserData.value = JSON.parse(JSON.stringify(UserData.value));
     
-    // Инициализация массивов если они undefined
     if (!UserData.value.workExperience) UserData.value.workExperience = [];
     if (!UserData.value.education) UserData.value.education = [];
     if (!UserData.value.skills) UserData.value.skills = [];
@@ -719,7 +703,6 @@ async function loadUserProfile() {
   }
 }
 
-// Обновление профиля
 async function updateUser() {
   isLoading.value = true;
   try {
@@ -845,18 +828,15 @@ async function updateUser() {
   }
 }
 
-// Сброс изменений
 async function resetProfile() {
   UserData.value = JSON.parse(JSON.stringify(originalUserData.value));
 }
 
-// Модальные окна
 const openModal = (type, index = -1) => {
   modalType.value = type;
   isEditing.value = index !== -1;
   editingIndex.value = index;
 
-  // Сброс данных модального окна
   Object.keys(modalData).forEach(key => modalData[key] = '');
 
   if (isEditing.value) {
@@ -865,7 +845,6 @@ const openModal = (type, index = -1) => {
       Object.assign(modalData, item);
     }
   } else {
-    // Заполнение данными пользователя для редактирования
     switch (type) {
       case 'contacts':
         Object.assign(modalData, {
@@ -890,7 +869,6 @@ const closeModal = () => {
   }, 300);
 };
 
-// Сохранение данных из модального окна
 const saveItem = async () => {
   if (!isFormValid.value) return;
 
@@ -1002,7 +980,6 @@ const saveItem = async () => {
   }
 };
 
-// Удаление элементов
 const deleteItem = (type, index) => {
   deleteType.value = type;
   deleteIndex.value = index;
@@ -1065,7 +1042,6 @@ const confirmDelete = async () => {
   }
 };
 
-// Вспомогательные функции
 const getItemByType = (type, index) => {
   switch (type) {
     case 'skill': return UserData.value.skills?.[index];
@@ -1164,7 +1140,6 @@ const setActiveMenuItem = (index) => {
   activeMenuItem.value = index;
 };
 
-// Computed для валидации формы
 const isFormValid = computed(() => {
   switch (modalType.value) {
     case 'name':
@@ -1234,7 +1209,6 @@ const fieldPlaceholders = {
   description: 'Расскажите о себе...'
 };
 
-// Загрузка профиля при монтировании
 onMounted(() => {
   loadUserProfile();
 });
