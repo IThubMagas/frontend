@@ -12,14 +12,12 @@
         </div>
       </div>
 
-      <!-- Сообщения об ошибках/успехе -->
       <div v-if="message" class="message" :class="{ error: error, success: !error }">
         {{ message }}
       </div>
 
       <div class="card-body">
         <transition name="form-slide" mode="out-in">
-          <!-- Форма входа -->
           <div v-if="currentMode === 'login'" class="form-wrapper">
             <h2 class="form-title">Добро пожаловать!</h2>
             <p class="form-subtitle">Войдите в свой аккаунт</p>
@@ -98,7 +96,6 @@
             </form>
           </div>
 
-          <!-- Форма регистрации -->
           <div v-else-if="currentMode === 'signup'" class="form-wrapper">
             <h2 class="form-title">Создайте аккаунт</h2>
             <p class="form-subtitle">Присоединяйтесь к нашему сообществу</p>
@@ -452,7 +449,6 @@ const errors = reactive({
   phoneNumber: ''
 })
 
-// Валидация полей
 const validateField = (field) => {
   const value = formData[field]
   
@@ -538,7 +534,6 @@ const validateField = (field) => {
   }
 }
 
-// Простое форматирование номера телефона
 const formatPhoneNumber = () => {
   let numbers = formData.phoneNumber.replace(/\D/g, '')
   
@@ -570,7 +565,6 @@ const handlePhoneInput = () => {
   formatPhoneNumber()
 }
 
-// Проверка валидности формы
 const isFormValid = computed(() => {
   switch (currentMode.value) {
     case 'login':
@@ -598,7 +592,6 @@ const isFormValid = computed(() => {
   }
 })
 
-// Сброс формы при смене режима
 watch(currentMode, () => {
   Object.keys(errors).forEach(key => errors[key] = '')
   message.value = ''
@@ -613,7 +606,6 @@ const switchTo = (mode) => {
   error.value = false
 }
 
-// Вход с использованием axios
 const handleLogin = async () => {
   if (!isFormValid.value) return
   
@@ -631,7 +623,6 @@ const handleLogin = async () => {
     console.log('Успешный ответ сервера:', response.data)
 
     if (response.data.token) {
-      // Сохраняем токен
       const token = response.data.token
       if (rememberMe.value) {
         localStorage.setItem('token', token)
@@ -639,7 +630,6 @@ const handleLogin = async () => {
         sessionStorage.setItem('token', token)
       }
       
-      // Устанавливаем заголовок для будущих запросов
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
       
       message.value = response.data.message || 'Вход успешен!'
@@ -647,18 +637,15 @@ const handleLogin = async () => {
       
       console.log('Токен сохранен, загружаем профиль...')
       
-      // Загружаем профиль через store
       try {
         await authStore.loadUserProfile()
         console.log('Профиль загружен, переходим...')
         
-        // Переходим на страницу профиля
         setTimeout(() => {
           router.push('/profile')
         }, 1000)
       } catch (profileError) {
         console.error('Ошибка загрузки профиля:', profileError)
-        // Но все равно переходим, так как токен есть
         setTimeout(() => {
           router.push('/profile')
         }, 1000)
@@ -670,7 +657,6 @@ const handleLogin = async () => {
   } catch (err) {
     console.error('Login error:', err)
     
-    // Проверяем, есть ли токен в ответе ошибки (иногда бывает)
     if (err.response?.data?.token) {
       const token = err.response.data.token
       localStorage.setItem('token', token)
@@ -691,14 +677,12 @@ const handleLogin = async () => {
   }
 }
 
-// Регистрация с использованием axios
 const handleSignup = async () => {
   if (!isFormValid.value) return
   
   loading.value = true
   
   try {
-    // Подготавливаем данные для регистрации
     const registrationData = {
       firstName: formData.firstName,
       lastName: formData.lastName,
@@ -707,7 +691,6 @@ const handleSignup = async () => {
       password: formData.password
     }
 
-    // Добавляем телефон если он есть и валиден
     if (formData.phoneNumber && !errors.phoneNumber) {
       registrationData.phoneNumber = formData.phoneNumber.replace(/\D/g, '')
     }
@@ -737,7 +720,6 @@ const handleSignup = async () => {
   }
 }
 
-// Подтверждение email
 const handleVerifyEmail = async () => {
   if (!isFormValid.value) return
   
@@ -749,14 +731,12 @@ const handleVerifyEmail = async () => {
     })
 
     if (response.data.token) {
-      // Сохраняем токен
       localStorage.setItem('token', response.data.token)
       axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`
       
       message.value = 'Email подтверждён!'
       error.value = false
       
-      // Обновляем store и переходим
       authStore.setToken(response.data.token)
       authStore.setUser(response.data.user)
       
@@ -774,7 +754,6 @@ const handleVerifyEmail = async () => {
   }
 }
 
-// Повторная отправка кода
 const resendCode = async () => {
   loading.value = true
   try {
@@ -793,7 +772,6 @@ const resendCode = async () => {
   }
 }
 
-// Восстановление пароля
 const handleForgot = async () => {
   if (!isFormValid.value) return
   
@@ -815,7 +793,6 @@ const handleForgot = async () => {
   }
 }
 
-// Сброс пароля
 const handleReset = async () => {
   if (!isFormValid.value) return
   
@@ -828,14 +805,12 @@ const handleReset = async () => {
     })
 
     if (response.data.token) {
-      // Сохраняем токен
       localStorage.setItem('token', response.data.token)
       axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`
       
       message.value = 'Пароль успешно сброшен!'
       error.value = false
       
-      // Обновляем store и переходим
       authStore.setToken(response.data.token)
       authStore.setUser(response.data.user)
       
