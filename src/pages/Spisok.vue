@@ -71,17 +71,17 @@
           <div class="user-info">
             <div class="avatar-container">
               <img
-                :src="resume.user.avatar ? `http://localhost:3000/uploads/avatars/${resume.user.avatar}` : '/images/placeholders/avatar.png'"
-                :alt="resume.user.name" class="user-avatar">
+                :src="resume.avatar ? `http://localhost:3000/uploads/avatars/${resume.avatar}` : '/images/placeholders/avatar.png'"
+                :alt="resume.name" class="user-avatar">
             </div>
 
             <div class="user-details">
-              <h3 class="user-name">{{ resume.user.lastName }} {{ resume.user.firstName }} {{ resume.user.patronymic }}
+              <h3 class="user-name">{{ resume.lastName }} {{ resume.firstName }} {{ resume.patronymic }}
               </h3>
               <p class="user-specialty">{{ resume.title }}</p>
 
               <div class="user-stats">
-                <span class="projects-count">{{ getProjectsString(resume.workExperience.length + resume.petProjects.length) }}</span>
+                <span class="projects-count">{{ getProjectsString(resume.workExperience?.length + resume.petProjects?.length) }}</span>
                 <span class="divider"></span>
                 <span class="experience-duration">{{ calculateExperience(resume.workExperience) }}</span>
               </div>
@@ -171,8 +171,8 @@ export default {
         if (this.selectedEmploymentType) queryString += `employmentType=${this.selectedEmploymentType}&`
         if (this.selectedStatus) queryString += `status=${this.selectedStatus}&`
 
-        const res = await axios.get(`http://localhost:3000/resume?${queryString}`)
-        this.resumes = res?.data?.resumes
+        const res = await axios.get(`http://localhost:3000/users?${queryString}`)
+        this.resumes = res?.data?.users
         this.pagination = res?.data?.pagination
         this.isResumesLoading = false
       } catch (error) {
@@ -184,7 +184,7 @@ export default {
     async loadStatusCounts() {
       for (const status of this.statuses) {
         try {
-          const response = await axios.get(`http://localhost:3000/resume/count?status=${status.enTitle}`)
+          const response = await axios.get(`http://localhost:3000/users/count?status=${status.enTitle}`)
           status.count = response.data
         } catch (error) {
           console.error('Ошибка:', error)
