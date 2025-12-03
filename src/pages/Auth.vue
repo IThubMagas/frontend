@@ -640,14 +640,10 @@ const handleLogin = async () => {
       try {
         await authStore.loadUserProfile()
         console.log('Профиль загружен, переходим...')
-        
-        setTimeout(() => {
-          router.push('/profile')
-        }, 1000)
       } catch (profileError) {
         console.error('Ошибка загрузки профиля:', profileError)
         setTimeout(() => {
-          router.push('/profile')
+          router.push('/profile/update')
         }, 1000)
       }
     } else {

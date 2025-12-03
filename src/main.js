@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { createPinia } from 'pinia'
 import './style.css'
 import App from './App.vue'
-import Resume from './pages/Resume.vue'
+import ProfileUpdate from './pages/ProfileUpdate.vue'
 import Auth from './pages/Auth.vue'
 import List from './pages/Spisok.vue'
 import Profile from './pages/Profile.vue'
@@ -20,9 +20,14 @@ const routes = [
     component: Error404
   },
   {
-    path: '/resume/:id',
-    name: 'Resume',
-    component: Resume
+    path: '/profile/:id',
+    name: 'Profile',
+    component: Profile
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile
   },
   {
     path: '/auth',
@@ -30,9 +35,9 @@ const routes = [
     component: Auth
   },
   {
-    path: '/profile',
-    name: 'Profile',
-    component: Profile
+    path: '/profile/update',
+    name: 'ProfileUpdate',
+    component: ProfileUpdate
   },
   {
     path: '/list',
