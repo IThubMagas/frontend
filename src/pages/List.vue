@@ -66,43 +66,43 @@
     </div>
 
     <div>
-      <div class="users-list" v-if="!isResumesLoading && resumes.length">
-        <div v-for="resume in resumes" :key="resume._id" class="user-card" @click="goToResume(resume._id)">
+      <div class="users-list" v-if="!isUsersLoading && users.length">
+        <div v-for="user in users" :key="user._id" class="user-card" @click="goToProfile(user._id)">
           <div class="user-info">
             <div class="avatar-container">
               <img
-                :src="resume.user.avatar ? `http://localhost:3000/uploads/avatars/${resume.user.avatar}` : '/images/placeholders/avatar.png'"
-                :alt="resume.user.name" class="user-avatar">
+                :src="user.avatar ? `http://localhost:3000/uploads/avatars/${user.avatar}` : '/images/placeholders/avatar.png'"
+                :alt="user.name" class="user-avatar">
             </div>
 
             <div class="user-details">
-              <h3 class="user-name">{{ resume.user.lastName }} {{ resume.user.firstName }} {{ resume.user.patronymic }}
+              <h3 class="user-name">{{ user.lastName }} {{ user.firstName }} {{ user.patronymic }}
               </h3>
-              <p class="user-specialty">{{ resume.title }}</p>
+              <p class="user-specialty">{{ user.title || "Vibe-Coder" }}</p>
 
               <div class="user-stats">
-                <span class="projects-count">{{ getProjectsString(resume.workExperience.length + resume.petProjects.length) }}</span>
+                <span class="projects-count">{{ getProjectsString(user.workExperience?.length + user.projects?.length) }}</span>
                 <span class="divider"></span>
-                <span class="experience-duration">{{ calculateExperience(resume.workExperience) }}</span>
+                <span class="experience-duration">{{ calculateExperience(user.workExperience) }}</span>
               </div>
             </div>
           </div>
 
           <div class="user-actions">
-            <button class="contact-button" @click.stop="handleContact(resume.user.phoneNumber)">
+            <button class="contact-button" @click.stop="handleContact(user.phoneNumber)">
                 Связаться
             </button>
           </div>
         </div>
       </div>
 
-      <div class="pagination" v-if="!isResumesLoading && resumes.length">
+      <div class="pagination" v-if="!isUsersLoading && users.length">
         <button :disabled="!pagination.hasPrev" @click="prevPage"><</button>
         <span>{{ pagination.currentPage }} / {{ pagination.totalPages }}</span>
         <button :disabled="!pagination.hasNext" @click="nextPage">></button>
       </div>
 
-      <div class="no-data" v-else-if="!isResumesLoading && !resumes.length">
+      <div class="no-data" v-else-if="!isUsersLoading && !users.length">
         По вашим фильтрам резюме не найдено. Попробуйте поменять фильтры.
       </div>
 
@@ -149,42 +149,42 @@ export default {
         { ruTitle: "Рассмотрит оффер", enTitle: "Open to offers", count: 0 },
         { ruTitle: "В активном поиске", enTitle: "Actively searching", count: 0 },
       ],
-      resumes: [],
+      users: [],
       pagination: {},
-      isResumesLoading: false
+      isUsersLoading: false
     }
   },
   mounted() {
-    this.loadResumes()
+    this.loadUsers()
     this.loadStatusCounts()
   },
   methods: {
     toggleIndustryFilter() {
       this.showIndustryFilter = !this.showIndustryFilter
     },
-    async loadResumes(page = 1) {
+    async loadUsers(page = 1) {
       try {
-        this.isResumesLoading = true
+        this.isUsersLoading = true
         let queryString = `page=${page}&`
         if (this.selectedIndustries.length) queryString += `industry=${this.selectedIndustries.join()}&`
         if (this.selectedWorkFormat) queryString += `workFormat=${this.selectedWorkFormat}&`
         if (this.selectedEmploymentType) queryString += `employmentType=${this.selectedEmploymentType}&`
         if (this.selectedStatus) queryString += `status=${this.selectedStatus}&`
 
-        const res = await axios.get(`http://localhost:3000/resume?${queryString}`)
-        this.resumes = res?.data?.resumes
+        const res = await axios.get(`http://localhost:3000/users?${queryString}`)
+        this.users = res?.data?.users
         this.pagination = res?.data?.pagination
-        this.isResumesLoading = false
+        this.isUsersLoading = false
       } catch (error) {
         console.error('Ошибка:', error)
-        this.resumes = []
-        this.isResumesLoading = false
+        this.users = []
+        this.isUsersLoading = false
       }
     },
     async loadStatusCounts() {
       for (const status of this.statuses) {
         try {
-          const response = await axios.get(`http://localhost:3000/resume/count?status=${status.enTitle}`)
+          const response = await axios.get(`http://localhost:3000/users/count?status=${status.enTitle}`)
           status.count = response.data
         } catch (error) {
           console.error('Ошибка:', error)
@@ -192,11 +192,11 @@ export default {
         }
       }
     },
-    goToResume(resumeId) {
-      this.$router.push({ 
-        name: 'Resume', 
-        params: { 
-          id: resumeId
+    goToProfile(userId) {
+      this.$router.push({
+        name: 'OtherProfile',
+        params: {
+          id: userId
         }
       })
     },
@@ -249,24 +249,24 @@ export default {
       return `${total} лет`;
     },
     prevPage() {
-      this.loadResumes(this.pagination.currentPage-1)
+      this.loadUsers(this.pagination.currentPage-1)
     },
     nextPage() {
-      this.loadResumes(this.pagination.currentPage+1)
+      this.loadUsers(this.pagination.currentPage+1)
     },
   },
   watch: {
     selectedIndustries() {
-      this.loadResumes()
+      this.loadUsers()
     },
     selectedWorkFormat() {
-      this.loadResumes()
+      this.loadUsers()
     },
     selectedEmploymentType() {
-      this.loadResumes()
+      this.loadUsers()
     },
     selectedStatus() {
-      this.loadResumes()
+      this.loadUsers()
     }
   }
 }
@@ -280,7 +280,7 @@ export default {
   align-items: flex-start;
   padding: 40px 0;
   gap: 93px;
-  width: fit-content;
+  width: 1260px;
   margin: 0 auto;
 }
 
@@ -295,7 +295,7 @@ export default {
   order: 0;
   flex-grow: 0;
   position: sticky;
-  top: 70px;
+  top: 10px;
   height: 100%;
 }
 
@@ -352,7 +352,7 @@ export default {
 .user-avatar {
   width: 126px;
   height: 126px;
-  border-radius: 103.279px;
+  border-radius: 50%;
   object-fit: cover;
   background: #f5f5f5;
 }
@@ -574,14 +574,14 @@ export default {
 }
 
 .industry-dropdown {
-  width: 268px;
+  width: 269px;
   background: #FFFFFF;
   border-radius: 8px;
   padding: 16px;
   border: 1px solid #e0e0e0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   position: absolute;
-  top: 60px;
+  top: 56px;
   left: 0;
   z-index: 10;
 }
