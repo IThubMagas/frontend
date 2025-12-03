@@ -1,6 +1,5 @@
 <template>
   <div class="app-conent">
-
     <div class="sidebar">
       <nav class="sidebar-nav">
         <ul class="nav-list">
@@ -13,12 +12,12 @@
       </nav>
     </div>
 
-    <div class="resume-container" v-if="resume">
+    <div class="profile-container" v-if="user">
       <div class="header-card" id="general">
         <div class="section">
           <div class="photo-container">
             <img
-              :src="resume.avatar ? `http://localhost:3000/uploads/avatars/${resume.avatar}` : '/images/placeholders/avatar.png'"
+              :src="user.avatar ? `http://localhost:3000/uploads/avatars/${user.avatar}` : '/images/placeholders/avatar.png'"
               alt="Фото" class="profile-photo" />
           </div>
           <div class="header-info">
@@ -26,11 +25,11 @@
               <h1 class="name">{{ fullName }}</h1>
             </div>
             <div class="position-section">
-              <p class="position">{{ resume?.title }}</p>
+              <p class="position">{{ user?.title }}</p>
             </div>
             <div class="meta-info">
               <div class="meta-item">
-                <span v-if="resume.age">Возраст: {{ resume.age }} лет</span>
+                <span v-if="user.age">Возраст: {{ user.age }} лет</span>
                 <span v-else>Возраст: Не указан</span>
               </div>
               <div class="meta-item">
@@ -41,16 +40,18 @@
               </div>
             </div>
             <div class="contacts-info" v-if="hasContacts">
-              <a v-if="resume.email" :href="`mailto:${resume.email}`" class="contact-link">
-                {{ resume.email }}
+              <a v-if="user.email" :href="`mailto:${user.email}`" class="contact-link">
+                {{ user.email }}
               </a>
-              <a v-if="resume.phoneNumber" :href="`tel:${resume.phoneNumber}`" class="contact-link">
-                {{ resume.phoneNumber }}
+              <a v-if="user.phoneNumber" :href="`tel:${user.phoneNumber}`" class="contact-link">
+                {{ user.phoneNumber }}
               </a>
-              <a v-if="resume.contacts?.telegram" :href="resume.contacts?.telegram" target="_blank" class="contact-link">
+              <a v-if="user.contacts?.telegram" :href="`https://t.me/${user.contacts?.telegram}`" target="_blank"
+                class="contact-link">
                 Telegram
               </a>
-              <a v-if="resume.contacts?.github" :href="resume.contacts?.github" target="_blank" class="contact-link">
+              <a v-if="user.contacts?.github" :href="`https://github.com/${user.contacts?.github}`" target="_blank"
+                class="contact-link">
                 GitHub
               </a>
             </div>
@@ -63,7 +64,7 @@
             <h2 class="section-title">О себе</h2>
           </div>
           <div class="card-2">
-            <p class="section-content">{{ resume.about }}</p>
+            <p class="section-content">{{ user.about }}</p>
           </div>
         </section>
       </div>
@@ -108,7 +109,7 @@
             <span v-for="(skill, index) in skills" :key="index" class="skill-tag">
               {{ skill }}
               <div class="skill-actions">
- 
+
               </div>
             </span>
           </div>
@@ -164,55 +165,56 @@
 
 <script setup>
 import axios from 'axios';
-import { ref, computed, reactive, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
 const activeMenuItem = ref(0);
 const menuItems = [
-  { title: 'Общее', id: "general", blockId: "" },
-  { title: 'О себе', id: "aboutMe", blockId: "" },
-  { title: 'Образование', id: "education", blockId: "" },
-  { title: 'Навыки', id: "skills", blockId: "" },
-  { title: 'Языки', id: "languages", blockId: "" },
-  { title: 'Опыт работы', id: "workExperience", blockId: "" },
+  { title: 'Общее', id: "general" },
+  { title: 'О себе', id: "aboutMe" },
+  { title: 'Образование', id: "education" },
+  { title: 'Навыки', id: "skills" },
+  { title: 'Языки', id: "languages" },
+  { title: 'Опыт работы', id: "workExperience" }
 ];
+
+const user = ref(null);
 
 const route = useRoute();
 const id = ref(null);
 id.value = route.params.id;
 
-async function loadResume() {
+async function loadProfile() {
   try {
-    const res = await axios.get(`http://localhost:3000/users/profile/me`)
-    resume.value = res.data.user
-    console.log(res.data.user);
-
+    if(!id.value) {
+      const res = await axios.get(`http://localhost:3000/users/profile/me`)
+      user.value = res.data.user
+    } else {
+      const res = await axios.get(`http://localhost:3000/users/${id.value}`)
+      user.value = res.data.user
+    }
   } catch (error) {
     console.error(error);
   }
 }
 
-
-const resume = ref(null);
-
 onMounted(() => {
-  loadResume()
+  loadProfile()
 })
 
-const fullName = computed(() => `${resume.value.firstName} ${resume.value.lastName} ${resume.value.patronymic}`);
-const workExperience = computed(() => resume.value?.workExperience || []);
-const education = computed(() => resume.value.education || []);
-const skills = computed(() => resume.value.skills || []);
-const languages = computed(() => resume.value.languages || []);
+const fullName = computed(() => `${user.value.firstName} ${user.value.lastName} ${user.value.patronymic}`);
+const workExperience = computed(() => user.value?.workExperience || []);
+const education = computed(() => user.value.education || []);
+const skills = computed(() => user.value.skills || []);
+const languages = computed(() => user.value.languages || []);
 const hasContacts = computed(() =>
-resume.value.email ||
-    resume.value.phone ||
-  resume.value.contacts && (
-    resume.value.contacts.telegram ||
-    resume.value.contacts.github
+  user.value.email ||
+  user.value.phone ||
+  user.value.contacts && (
+    user.value.contacts.telegram ||
+    user.value.contacts.github
   )
 );
-
 </script>
 
 <style scoped>
@@ -220,7 +222,7 @@ resume.value.email ||
   display: flex;
   margin-top: 40px;
   width: 1260px;
-  gap: 97px;
+  gap: 94px;
   margin-inline: auto;
   margin-bottom: 100px;
 }
@@ -234,9 +236,13 @@ resume.value.email ||
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  width: 268px;
+  width: 270px;
   border-radius: 10px;
   gap: 8px;
+}
+
+.nav-item {
+  border: 1px solid #e0e0e0;
 }
 
 .nav-link {
@@ -289,7 +295,7 @@ resume.value.email ||
   margin-bottom: 8px;
 }
 
-.resume-container {
+.profile-container {
   font-family: "Inter", sans-serif;
   font-optical-sizing: auto;
   color: #333;
@@ -307,7 +313,7 @@ resume.value.email ||
   display: flex;
   flex-direction: column;
   gap: 16px;
-  border-radius: 12px;
+  border-radius: 8px;
   background: #fff;
 }
 
@@ -336,8 +342,8 @@ resume.value.email ||
 }
 
 .header-card {
-  
-  border-radius: 12px;
+
+  border-radius: 8px;
   padding: 32px;
   background-color: #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -351,9 +357,10 @@ resume.value.email ||
 }
 
 .profile-photo {
-  width: 126px;
-  height: 126px;
+  width: 128px;
+  height: 128px;
   object-fit: cover;
+  display: block;
   border-radius: 50%;
   border: 1px solid #ddd;
 }
@@ -700,7 +707,7 @@ resume.value.email ||
 
 .modal-content {
   background: white;
-  border-radius: 12px;
+  border-radius: 8px;
   width: 100%;
   max-width: 500px;
   max-height: 90vh;

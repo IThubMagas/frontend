@@ -8,14 +8,14 @@
       <nav class="header__nav">
         <div class="nav__links">
           <router-link to="/" class="nav__link">Главная</router-link>
-          <router-link to="/services" class="nav__link">Специалисты</router-link>
+          <router-link to="/list" class="nav__link">Специалисты</router-link>
           <router-link to="/about" class="nav__link">О нас</router-link>
         </div>
         
         <div v-if="isAuthenticated" class="user-menu">
           <router-link to="/profile" class="user-profile-link">
             <div class="user-avatar">
-              <div v-if="user.avatar" class="avatar-img" :style="{ backgroundImage: `url(${user.avatar})` }"></div>
+              <div v-if="user.avatar" class="avatar-img" :style="{ backgroundImage: `url(http://localhost:3000/uploads/avatars/${user.avatar})` }"></div>
               <div v-else class="avatar-placeholder">{{ userInitials }}</div>
             </div>
             <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
@@ -219,6 +219,7 @@ const handleLogout = () => {
   height: 100%;
   background-size: cover;
   background-position: center;
+  border-radius: 50%;
 }
 
 .avatar-placeholder {
