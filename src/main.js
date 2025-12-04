@@ -5,7 +5,7 @@ import './style.css'
 import App from './App.vue'
 import ProfileUpdate from './pages/ProfileUpdate.vue'
 import Auth from './pages/Auth.vue'
-import List from './pages/Spisok.vue'
+import List from './pages/List.vue'
 import Profile from './pages/Profile.vue'
 import Error404 from './pages/Error404.vue'
 
@@ -14,14 +14,14 @@ const routes = [
     path: '/',
     redirect: '/list'
   },
-   {
+  {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
     component: Error404
   },
   {
     path: '/profile/:id',
-    name: 'Profile',
+    name: 'OtherProfile',
     component: Profile
   },
   {
