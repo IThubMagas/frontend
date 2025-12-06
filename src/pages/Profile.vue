@@ -20,6 +20,7 @@
               :src="user.avatar ? `http://localhost:3000/uploads/avatars/${user.avatar}` : '/images/placeholders/avatar.png'"
               alt="Фото" class="profile-photo" />
           </div>
+          <router-link to="/profile/update" class="update-btn">Изменить</router-link>
           <div class="header-info">
             <div class="name-section">
               <h1 class="name">{{ fullName }}</h1>
@@ -56,6 +57,7 @@
               </a>
             </div>
           </div>
+
         </div>
 
         <!-- О себе -->
@@ -226,7 +228,17 @@ const hasContacts = computed(() =>
   margin-inline: auto;
   margin-bottom: 100px;
 }
-
+.update-btn{
+  padding: 10px 20px;
+  background-color: #5E61FF;  
+  border-radius: 10px;
+  position: absolute;
+  right: 230px;
+  color: #fff;
+}
+.update-btn:hover{
+  background-color: #a1a2f8;
+}
 .sidebar {
   color: #0B0B0B;
   height: 100vh;
@@ -296,6 +308,7 @@ const hasContacts = computed(() =>
 }
 
 .profile-container {
+width: 820px;
   font-family: "Inter", sans-serif;
   font-optical-sizing: auto;
   color: #333;

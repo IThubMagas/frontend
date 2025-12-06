@@ -9,7 +9,7 @@
         <div class="nav__links">
           <router-link to="/" class="nav__link">Главная</router-link>
           <router-link to="/list" class="nav__link">Специалисты</router-link>
-          <router-link to="/about" class="nav__link">О нас</router-link>
+          <router-link to="/" class="nav__link">О нас</router-link>
         </div>
         
         <div v-if="isAuthenticated" class="user-menu">
