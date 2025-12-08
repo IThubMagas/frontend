@@ -19,7 +19,7 @@
           <div class="profile-avatar flex mt-8 items-center gap-6">
             <div class="relative">
               <img
-                :src="avatarPreview || (UserData.avatar ? `http://localhost:3000/uploads/avatars/${UserData.avatar}` : 'images/placeholders/avatar.png')"
+                :src="avatarPreview || (UserData.avatar ? `http://192.168.198.11:3000/uploads/avatars/${UserData.avatar}` : 'images/placeholders/avatar.png')"
                 class="w-[120px] h-[120px] rounded-full object-cover" alt="Фото профиля">
             </div>
             <div class="gap-4 flex">
@@ -724,7 +724,7 @@ const getAuthHeaders = () => {
 async function loadUserProfile() {
   isLoading.value = true;
   try {
-    const response = await axios.get("http://localhost:3000/users/profile/me", {
+    const response = await axios.get("http://192.168.198.11:3000/users/profile/me", {
       headers: getAuthHeaders()
     });
 
@@ -849,7 +849,7 @@ async function updateUser() {
     }
 
     const response = await axios.put(
-      "http://localhost:3000/users/profile/me",
+      "http://192.168.198.11:3000/users/profile/me",
       formData,
       {
         headers: {
@@ -1110,7 +1110,7 @@ const downloadFile = async (file) => {
 
   if (typeof file === 'string') {
     if (!file.startsWith('http')) {
-      file = `http://localhost:3000/uploads/achievements/${file}`;
+      file = `http://192.168.198.11:3000/uploads/achievements/${file}`;
     }
 
     try {

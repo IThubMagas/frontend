@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
-const API_URL = 'http://localhost:3000'
+const API_URL = 'http://192.168.198.11:3000'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
