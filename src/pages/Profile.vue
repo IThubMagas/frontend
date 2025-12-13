@@ -17,7 +17,7 @@
         <div class="section">
           <div class="photo-container">
             <img
-              :src="user.avatar ? `http://192.168.198.11:3000/uploads/avatars/${user.avatar}` : '/images/placeholders/avatar.png'"
+              :src="user.avatar ? `http://localhost:3000/uploads/avatars/${user.avatar}` : '/images/placeholders/avatar.png'"
               alt="Фото" class="profile-photo" />
           </div>
           <router-link to="/profile/update" class="update-btn">Изменить</router-link>
@@ -189,10 +189,10 @@ id.value = route.params.id;
 async function loadProfile() {
   try {
     if(!id.value) {
-      const res = await axios.get(`http://192.168.198.11:3000/users/profile/me`)
+      const res = await axios.get(`http://localhost:3000/users/profile/me`)
       user.value = res.data.user
     } else {
-      const res = await axios.get(`http://192.168.198.11:3000/users/${id.value}`)
+      const res = await axios.get(`http://localhost:3000/users/${id.value}`)
       user.value = res.data.user
     }
   } catch (error) {

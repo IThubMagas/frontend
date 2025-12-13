@@ -71,7 +71,7 @@
           <div class="user-info">
             <div class="avatar-container">
               <img
-                :src="user.avatar ? `http://192.168.198.11:3000/uploads/avatars/${user.avatar}` : '/images/placeholders/avatar.png'"
+                :src="user.avatar ? `http://localhost:3000/uploads/avatars/${user.avatar}` : '/images/placeholders/avatar.png'"
                 :alt="user.name" class="user-avatar">
             </div>
 
@@ -171,7 +171,7 @@ export default {
         if (this.selectedEmploymentType) queryString += `employmentType=${this.selectedEmploymentType}&`
         if (this.selectedStatus) queryString += `status=${this.selectedStatus}&`
 
-        const res = await axios.get(`http://192.168.198.11:3000/users?${queryString}`)
+        const res = await axios.get(`http://localhost:3000/users?${queryString}`)
         this.users = res?.data?.users
         this.pagination = res?.data?.pagination
         this.isUsersLoading = false
@@ -184,7 +184,7 @@ export default {
     async loadStatusCounts() {
       for (const status of this.statuses) {
         try {
-          const response = await axios.get(`http://192.168.198.11:3000/users/count?status=${status.enTitle}`)
+          const response = await axios.get(`http://localhost:3000/users/count?status=${status.enTitle}`)
           status.count = response.data
         } catch (error) {
           console.error('Ошибка:', error)

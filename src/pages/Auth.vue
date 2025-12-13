@@ -615,7 +615,7 @@ const handleLogin = async () => {
   try {
     console.log('Отправка запроса на вход...')
 
-    const response = await axios.post('http://192.168.198.11:3000/auth/login', {
+    const response = await axios.post('http://localhost:3000/auth/login', {
       email: formData.email,
       password: formData.password
     })
@@ -691,7 +691,7 @@ const handleSignup = async () => {
       registrationData.phoneNumber = formData.phoneNumber.replace(/\D/g, '')
     }
 
-    const response = await axios.post('http://192.168.198.11:3000/auth/registration', registrationData)
+    const response = await axios.post('http://localhost:3000/auth/registration', registrationData)
     
     if (response.data.message) {
       message.value = response.data.message || 'Регистрация успешна! Код подтверждения отправлен на email.'
@@ -721,7 +721,7 @@ const handleVerifyEmail = async () => {
   
   loading.value = true
   try {
-    const response = await axios.post('http://192.168.198.11:3000/auth/verify-email', {
+    const response = await axios.post('http://localhost:3000/auth/verify-email', {
       email: formData.email,
       code: formData.verificationCode
     })
@@ -753,7 +753,7 @@ const handleVerifyEmail = async () => {
 const resendCode = async () => {
   loading.value = true
   try {
-    const response = await axios.post('http://192.168.198.11:3000/auth/resend-verify', { 
+    const response = await axios.post('http://localhost:3000/auth/resend-verify', { 
       email: formData.email 
     })
     
@@ -773,7 +773,7 @@ const handleForgot = async () => {
   
   loading.value = true
   try {
-    const response = await axios.post('http://192.168.198.11:3000/auth/forgot-password', { 
+    const response = await axios.post('http://localhost:3000/auth/forgot-password', { 
       email: formData.email 
     })
     
@@ -794,7 +794,7 @@ const handleReset = async () => {
   
   loading.value = true
   try {
-    const response = await axios.post('http://192.168.198.11:3000/auth/reset-password', {
+    const response = await axios.post('http://localhost:3000/auth/reset-password', {
       email: formData.email,
       resetCode: formData.resetCode,
       newPassword: formData.password
