@@ -15,7 +15,7 @@
         <div v-if="isAuthenticated" class="user-menu">
           <router-link to="/profile" class="user-profile-link">
             <div class="user-avatar">
-              <div v-if="user.avatar" class="avatar-img" :style="{ backgroundImage: `url(http://localhost:3000/uploads/avatars/${user.avatar})` }"></div>
+              <div v-if="user.avatar" class="avatar-img" :style="{ backgroundImage: `url(https://api.stchub.ru/uploads/avatars/${user.avatar})` }"></div>
               <div v-else class="avatar-placeholder">{{ userInitials }}</div>
             </div>
             <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
@@ -46,7 +46,7 @@ const user = ref({
   avatar: null
 })
 
-const API_URL = 'http://localhost:3000'
+const API_URL = 'https://api.stchub.ru'
 
 const userInitials = computed(() => {
   const { firstName, lastName } = user.value
